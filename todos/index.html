@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+    <title>The Bane of TODOs</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="TODOs are great. In my head they're short and concise notes that will remind future me about issues and outstanding work that I'll get to one day. They'll be ticked off one by one in small commits that paint a beautifully satisfying `git log`. Surely?"/>
+    <meta name="author" content="Dom Williams">
+    <!--<meta name="keywords" content="todo, perl, git, commit, hook, planning"/>-->
+    <style type="text/css">:root{font-family:"Helvetica Neue",system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:#333;background-color:#fefefe;text-rendering:optimizeLegibility;font-size:16pt}body{max-width:38rem;padding:1rem;margin:auto}pre{padding:20px;border-radius:8px;font-size:.9rem;overflow:auto}code{overflow:scroll;overflow-y:auto;overflow-x:auto;font-family:Consolas,Monaco,Andale Mono,Ubuntu Mono,monospace;-webkit-font-feature-settings:normal;-moz-font-feature-settings:normal;font-feature-settings:normal;padding:3px;margin:3px;border-radius:4px;font-weight:400;background:#ececee}pre code{background:none !important;color:#ccc}article{line-height:1.6rem;display:block}p{font-size:1.1rem}blockquote{border-left:2px solid;margin:40px 15px;padding:10px;font-style:italic}@media(max-width:683px){blockquote{margin:10px;padding:10px}}blockquote:before{content:"”";font-family:Georgia,serif;font-size:3.875rem;position:absolute;left:-40px;top:-20px}blockquote p:first-of-type{margin-top:0}blockquote p:last-of-type{margin-bottom:0}.article-date{color:#777;margin-bottom:20px}main header{margin:0}main header h1{margin-bottom:0}.article-title{font-size:2rem}.prev-next{width:100%}.next{float:right}nav#toc ul{list-style-type:disc;padding-left:10px;margin-left:10px}#toc{float:right;margin:0 1.5rem;background-color:#fafafa;padding:.5rem .5rem;border-radius:4px;line-height:1.5rem}#toc a,#toc a:visited{color:#0679a7}@media(max-width:500px){#toc{float:none;margin:auto;width:70%}.header-nav{display:block !important;float:none !important;text-align:center}:root{font-size:12pt}}#blog-header{border-bottom:2px solid #333;margin:0 auto 5px;display:block;overflow:hidden}#blog-header h1{font-size:1.6rem}#blog-header nav{float:right}.link5eva a:visited,.link5eva a{color:var(--color)}#blog-header a{text-decoration:none;display:inline-block}#blog-header a:hover{color:#414141}.header-nav{display:inline;margin:auto;padding:.5rem 0}.icons svg{width:1rem;height:auto;padding:0 10px;color:#111}.footnote,.footnote p{font-size:.9em;font-style:italic;line-height:1.4}.footnote{font-style:normal}.footnote-ref{padding:0 .2rem}.img_container img{max-width:90%;height:auto}.img_caption{text-align:left;font-size:.9em;font-style:italic}.hidden{display:none}</style>
+</head>
+
+<body>
+<header id="blog-header">
+    <div class="link5eva">
+        <h1 class="notalink header-nav"><a href="/" title="Return to root">Dom Williams</a></h1>
+        <nav class="icons header-nav">
+            <a href="/index.xml" title="RSS feed">
+                <span class="hidden">RSS</span>
+                <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>RSS</title>
+                    <path d="M19.199 24C19.199 13.467 10.533 4.8 0 4.8V0c13.165 0 24 10.835 24 24h-4.801zM3.291 17.415c1.814 0 3.293 1.479 3.293 3.295 0 1.813-1.485 3.29-3.301 3.29C1.47 24 0 22.526 0 20.71s1.475-3.294 3.291-3.295zM15.909 24h-4.665c0-6.169-5.075-11.245-11.244-11.245V8.09c8.727 0 15.909 7.184 15.909 15.91z"/>
+                </svg>
+            </a>
+            <a href="https://github.com/DomWilliams0" title="GitHub">
+                <span class="hidden">GitHub</span>
+                <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>GitHub</title>
+                    <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+                </svg>
+            </a>
+            <a href="mailto:contact@domwillia.ms" title="Contact Me">
+                <span class="hidden">Email</span>
+                <!-- icon from Font Awesome: https://fontawesome.com/license-->
+                <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="envelope"
+                     class="svg-inline--fa fa-envelope fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg"
+                     viewBox="0 0 512 512">
+                    <path fill="currentColor"
+                          d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+                </svg>
+
+            </a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <header>
+        <h1 class="article-title">The Bane of TODOs</h1>
+        <div class="article-date"><time datetime="01-06-2020">01 Jun 2020</time></div>
+    </header>
+
+    <article>
+<!--        <nav id="toc" class="link5eva">-->
+<!--            <strong>Table of Contents</strong>-->
+<!--            <div class="toc">
+<ul>
+<li><a href="#the-poor-mans-kanban">The poor man's kanban</a></li>
+<li><a href="#git-hooks-to-the-rescue">Git hooks to the rescue</a><ul>
+<li><a href="#todos-pl">todos.pl</a></li>
+<li><a href="#git-hooks-pre-commit">.git/hooks/pre-commit</a></li>
+<li><a href="#output">Output</a></li>
+</ul>
+</li>
+<li><a href="#remarks">Remarks</a></li>
+</ul>
+</div>
+-->
+<!--        </nav>-->
+
+        <p>TODOs are great. In my head they're short and concise notes that will remind future me about issues and outstanding work that I'll get to one day. They'll be ticked off one by one in small commits that paint a beautifully satisfying <code>git log</code>. Surely?</p>
+<p>In reality they're meaningless splatters of incoherent noise stuffed into random places littered across the code base. Often they'll either declare the surrounding code hideous/broken/incorrect, with no explanation or suggestion on what could be done better, or summarise a clear-at-the-time thought in an opaque handful of abbreviations<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>.</p>
+<h2 id="the-poor-mans-kanban">The poor man's kanban</h2>
+<p>My side projects are filled with TODOs of greatly varying detail<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>, which for the most part peter out before planning and task prioritisation ever becomes an issue. Professionally this is where tickets, sprints and retrospectives come in, but for side projects I'd prefer the middle ground without maintaining a full ticket system.</p>
+<p>As it turns out, TODOs don't have to be scattered and unorganised, nor rigidly maintained in a separate place. By combining the power of git hooks, dirty scripts and markdown, we can achieve a reasonable middle ground.</p>
+<h2 id="git-hooks-to-the-rescue">Git hooks to the rescue</h2>
+<p>In a nutshell, I grep for TODOs in a pre-commit hook and dump them into a version controlled markdown file. It comes in the form of a dense mass of punctuation that, just by chance, is valid Perl<sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup>.</p>
+<h3 id="todos-pl">todos.pl</h3>
+<div class="code" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #8f5902; font-style: italic">#!/usr/bin/perl</span>
+<span style="color: #204a87; font-weight: bold">use</span> <span style="color: #000000">strict</span><span style="color: #000000; font-weight: bold">;</span>
+<span style="color: #204a87; font-weight: bold">use</span> <span style="color: #000000">warnings</span><span style="color: #000000; font-weight: bold">;</span>
+
+<span style="color: #8f5902; font-style: italic"># output file to skip searching for TODOs</span>
+<span style="color: #204a87; font-weight: bold">my</span> <span style="color: #000000">$md</span> <span style="color: #ce5c00; font-weight: bold">=</span> <span style="color: #000000">$ARGV</span><span style="color: #000000; font-weight: bold">[</span><span style="color: #0000cf; font-weight: bold">0</span><span style="color: #000000; font-weight: bold">]</span> <span style="color: #ce5c00; font-weight: bold">||</span> <span style="color: #4e9a06">&quot;TODOS.md&quot;</span><span style="color: #000000; font-weight: bold">;</span>
+
+<span style="color: #204a87">open</span> <span style="color: #000000">LINES</span><span style="color: #000000; font-weight: bold">,</span> <span style="color: #4e9a06">&quot;git grep -I -n -E \&quot;TODO|FIXME\&quot; |&quot;</span> <span style="color: #204a87; font-weight: bold">or</span> <span style="color: #204a87">die</span> <span style="color: #4e9a06">&quot;git grep failed: $!&quot;</span><span style="color: #000000; font-weight: bold">;</span>
+
+<span style="color: #204a87; font-weight: bold">my</span> <span style="color: #000000">%todos</span><span style="color: #000000; font-weight: bold">;</span>
+<span style="color: #204a87; font-weight: bold">my</span> <span style="color: #000000">@files</span><span style="color: #000000; font-weight: bold">;</span>
+<span style="color: #204a87; font-weight: bold">my</span> <span style="color: #000000">$count</span> <span style="color: #ce5c00; font-weight: bold">=</span> <span style="color: #0000cf; font-weight: bold">0</span><span style="color: #000000; font-weight: bold">;</span>
+<span style="color: #204a87; font-weight: bold">while</span> <span style="color: #000000; font-weight: bold">(</span><span style="color: #4e9a06">&lt;LINES&gt;</span><span style="color: #000000; font-weight: bold">)</span> <span style="color: #000000; font-weight: bold">{</span>
+    <span style="color: #204a87; font-weight: bold">next</span> <span style="color: #204a87; font-weight: bold">if</span> <span style="color: #4e9a06">/^$md:/</span><span style="color: #000000; font-weight: bold">;</span>
+    <span style="color: #204a87; font-weight: bold">if</span> <span style="color: #000000; font-weight: bold">(</span><span style="color: #204a87; font-weight: bold">my</span> <span style="color: #000000">@match</span> <span style="color: #ce5c00; font-weight: bold">=</span> <span style="color: #4e9a06">m/^([^:]+):(\d+):\s*(.+)\n$/</span><span style="color: #000000; font-weight: bold">)</span> <span style="color: #000000; font-weight: bold">{</span>
+        <span style="color: #204a87; font-weight: bold">my</span> <span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">$file</span><span style="color: #000000; font-weight: bold">,</span> <span style="color: #000000">$line_no</span><span style="color: #000000; font-weight: bold">,</span> <span style="color: #000000">$todo</span><span style="color: #000000; font-weight: bold">)</span> <span style="color: #ce5c00; font-weight: bold">=</span> <span style="color: #000000">@match</span><span style="color: #000000; font-weight: bold">;</span>
+        <span style="color: #204a87">push</span> <span style="color: #000000">@</span><span style="color: #000000; font-weight: bold">{</span><span style="color: #000000">$todos</span><span style="color: #000000; font-weight: bold">{</span><span style="color: #000000">$file</span><span style="color: #000000; font-weight: bold">}},</span> <span style="color: #000000">$todo</span><span style="color: #000000; font-weight: bold">;</span>
+        <span style="color: #000000">$count</span><span style="color: #ce5c00; font-weight: bold">++</span><span style="color: #000000; font-weight: bold">;</span>
+
+        <span style="color: #204a87">push</span> <span style="color: #000000">@files</span><span style="color: #000000; font-weight: bold">,</span> <span style="color: #000000">$file</span> <span style="color: #204a87; font-weight: bold">unless</span> <span style="color: #000000">@files</span> <span style="color: #ce5c00; font-weight: bold">&amp;&amp;</span> <span style="color: #000000">$files</span><span style="color: #000000; font-weight: bold">[</span><span style="color: #ce5c00; font-weight: bold">-</span><span style="color: #0000cf; font-weight: bold">1</span><span style="color: #000000; font-weight: bold">]</span> <span style="color: #204a87; font-weight: bold">eq</span> <span style="color: #000000">$file</span><span style="color: #000000; font-weight: bold">;</span>
+    <span style="color: #000000; font-weight: bold">}</span> <span style="color: #204a87; font-weight: bold">else</span> <span style="color: #000000; font-weight: bold">{</span>
+        <span style="color: #204a87">die</span> <span style="color: #4e9a06">&quot;bad line: $_\n&quot;</span><span style="color: #000000; font-weight: bold">;</span>
+    <span style="color: #000000; font-weight: bold">}</span>
+<span style="color: #000000; font-weight: bold">}</span>
+
+<span style="color: #204a87; font-weight: bold">print</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #4e9a06">&quot;# TODOs ($count)\n&quot;</span><span style="color: #000000; font-weight: bold">);</span>
+<span style="color: #204a87; font-weight: bold">foreach</span> <span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">@files</span><span style="color: #000000; font-weight: bold">)</span> <span style="color: #000000; font-weight: bold">{</span>
+    <span style="color: #204a87; font-weight: bold">my</span> <span style="color: #000000">@todos</span> <span style="color: #ce5c00; font-weight: bold">=</span> <span style="color: #000000">@</span><span style="color: #000000; font-weight: bold">{</span><span style="color: #000000">$todos</span><span style="color: #000000; font-weight: bold">{</span><span style="color: #000000">$_</span><span style="color: #000000; font-weight: bold">}};</span>
+    <span style="color: #204a87; font-weight: bold">my</span> <span style="color: #000000">$count</span> <span style="color: #ce5c00; font-weight: bold">=</span> <span style="color: #000000">@todos</span><span style="color: #000000; font-weight: bold">;</span>
+    <span style="color: #204a87; font-weight: bold">print</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #4e9a06">&quot; * [$_]($_) ($count)\n&quot;</span><span style="color: #000000; font-weight: bold">);</span>
+    <span style="color: #204a87; font-weight: bold">foreach</span> <span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">@todos</span><span style="color: #000000; font-weight: bold">)</span> <span style="color: #000000; font-weight: bold">{</span>
+        <span style="color: #204a87; font-weight: bold">print</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #4e9a06">&quot;   * `$_`\n&quot;</span><span style="color: #000000; font-weight: bold">);</span>
+    <span style="color: #000000; font-weight: bold">}</span>
+<span style="color: #000000; font-weight: bold">}</span>
+</code></pre></div>
+
+
+<h3 id="git-hooks-pre-commit">.git/hooks/pre-commit</h3>
+<div class="code" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #8f5902; font-style: italic">#!/bin/sh</span>
+
+<span style="color: #000000">OUTFILE</span><span style="color: #ce5c00; font-weight: bold">=</span><span style="color: #4e9a06">&quot;TODOS.md&quot;</span>
+~/bin/todos.pl <span style="color: #000000">$OUTFILE</span> &gt; <span style="color: #000000">$OUTFILE</span>
+git add <span style="color: #000000">$OUTFILE</span>
+</code></pre></div>
+
+
+<h3 id="output">Output</h3>
+<p>On each commit, all TODO/FIXMEs in the project excluding the TODO list itself are scraped and written to <code>TODOS.md</code>, grouped by file path. Each file name is a hyperlink, and the number of TODOs per file and total count are shown too.</p>
+<p>The markdown is pretty when rendered on your repository host of choice, and viewing the mighty task list in a browser easily beats the plain <code>grep</code> output or IDE view.</p>
+<p><span class="img_container" style="display: inline-block;"><img alt="Example generated markdown rendered on GitHub" src="/images/todos-rendered.png" style="display:block; margin-left: auto; margin-right: auto;" title="A snippet of the TODOs from my current gamedev project, rendered on GitHub." /><span class="img_caption" style="display: block; text-align: center;">A snippet of the TODOs from my current gamedev project, rendered on GitHub.</span></span></p>
+<p>I keep this script in <code>~/bin</code> for easy use across projects, but you may find it better to store it in the repository e.g. <code>$REPO/.dev/</code> if there are multiple developers.</p>
+<h2 id="remarks">Remarks</h2>
+<p>In the short time I've been trialling this, I've found it's surprisingly effective motivation to write coherent and meaningful TODOs. Publishing these in a publicly accessible formatted file means there is now very little friction preventing a new visitor to the repository glancing through the outstanding task list. Garbled streams of consciousness trashing the code doesn't shine a good light on the project, especially for first impressions.</p>
+<p>The fact that it is automatically kept up to date without any thought is not to be sneezed at. I have a graveyard of <code>todos.txt</code>s and <code>plans.md</code>s that live externally to the repository, and always end up being a write-only brain dump that was beneficial only for that planning session. For some reason I'm always reluctant to delete anything from those files for fear of losing any divine insights they might have contained, even if the notes are long-since irrelevant.</p>
+<p>What's more, a running counter of the total TODOs is very satisfying, and a metric I didn't know I wanted. Seeing it decrease is a rare and enjoyable event, only if I can control myself for long enough to complete <em>only</em> the task at hand and not replace it with a handful more.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>Whatever divide inspiration inspired past me to scrawl <code>TODO fix this</code> and <code>FIXME dont do this</code> on a function is long gone; I guess I'll leave them there for a few more weeks and delete them silently in an unrelated commit.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>That is, the occasional comment actually contains some information about the code, and makes sense at a glance. The majority end up as a simple marker that boils down to "code bad, redo code better".&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:3">
+<p>Why Perl? It's typically present by default on most machines, and is very capable at running shell commands and processing the output. Bash and/or Python could have done just as well of a job, but Perl fits both tasks perfectly. Plus, I've been spoiling myself with too much ergonomic Rust syntax recently, one has to stay on one's toes.&#160;<a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+    </article>
+</main>
+
+<footer>
+    <div class="prev-next">
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+</div>
+
+    <hr/>
+</footer>
+</body>
+</html>
+
