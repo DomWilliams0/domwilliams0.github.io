@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+    <title>Devlog #0: vision and goals</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="This post aims to introduce my ambitious, long-term gamedev project, along with my vision and long term goals for it. In essence, it could be described as a deep simulation, not unlike and very much inspired by Dwarf Fortress and Rimworld."/>
+    <meta name="author" content="Dom Williams">
+    <!--<meta name="keywords" content="rust, gamedev, devlog, goals, name-needed"/>-->
+    <style type="text/css">:root{font-family:"Helvetica Neue",system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:#333;background-color:#fefefe;text-rendering:optimizeLegibility;font-size:16pt}body{max-width:38rem;padding:1rem;margin:auto}video{max-width:35rem;margin:auto;display:block}pre{padding:20px;border-radius:8px;font-size:.9rem;overflow:auto}code{overflow:scroll;overflow-y:auto;overflow-x:auto;font-family:Consolas,Monaco,Andale Mono,Ubuntu Mono,monospace;-webkit-font-feature-settings:normal;-moz-font-feature-settings:normal;font-feature-settings:normal;padding:3px;margin:3px;border-radius:4px;font-weight:400;background:#ececee}pre code{background:none !important;color:#ccc}article{line-height:1.6rem;display:block}p{font-size:1.1rem}blockquote{border-left:2px solid;margin:40px 15px;padding:10px;font-style:italic}@media(max-width:683px){blockquote{margin:10px;padding:10px}}blockquote:before{content:"”";font-family:Georgia,serif;font-size:3.875rem;position:absolute;left:-40px;top:-20px}blockquote p:first-of-type{margin-top:0}blockquote p:last-of-type{margin-bottom:0}.article-date{color:#777;margin-bottom:20px}main header{margin:0}main header h1{margin-bottom:0}.article-title{font-size:2rem}.prev-next{width:100%}.next{float:right}nav#toc ul{list-style-type:disc;padding-left:10px;margin-left:10px}#toc{float:right;margin:0 1.5rem;background-color:#fafafa;padding:.5rem .5rem;border-radius:4px;line-height:1.5rem}#toc a,#toc a:visited{color:#0679a7}@media(max-width:500px){#toc{float:none;margin:auto;width:70%}.header-nav{display:block !important;float:none !important;text-align:center}:root{font-size:12pt}}#blog-header{border-bottom:2px solid #333;margin:0 auto 5px;display:block;overflow:hidden}#blog-header h1{font-size:1.6rem}#blog-header nav{float:right}.link5eva a:visited,.link5eva a{color:var(--color)}#blog-header a{text-decoration:none;display:inline-block}#blog-header a:hover{color:#414141}.header-nav{display:inline;margin:auto;padding:.5rem 0}.icons svg{width:1rem;height:auto;padding:0 10px;color:#111}.footnote,.footnote p{font-size:.9em;font-style:italic;line-height:1.4}.footnote{font-style:normal}.footnote-ref{padding:0 .2rem}.img_container img{max-width:90%;height:auto}.img_caption{text-align:left;font-size:.9em;font-style:italic}.hidden{display:none}</style>
+</head>
+
+<body>
+<header id="blog-header">
+    <div class="link5eva">
+        <h1 class="notalink header-nav"><a href="/" title="Return to root">Dom Williams</a></h1>
+        <nav class="icons header-nav">
+            <a href="/index.xml" title="RSS feed">
+                <span class="hidden">RSS</span>
+                <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>RSS</title>
+                    <path d="M19.199 24C19.199 13.467 10.533 4.8 0 4.8V0c13.165 0 24 10.835 24 24h-4.801zM3.291 17.415c1.814 0 3.293 1.479 3.293 3.295 0 1.813-1.485 3.29-3.301 3.29C1.47 24 0 22.526 0 20.71s1.475-3.294 3.291-3.295zM15.909 24h-4.665c0-6.169-5.075-11.245-11.244-11.245V8.09c8.727 0 15.909 7.184 15.909 15.91z"/>
+                </svg>
+            </a>
+            <a href="https://github.com/DomWilliams0" title="GitHub">
+                <span class="hidden">GitHub</span>
+                <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>GitHub</title>
+                    <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+                </svg>
+            </a>
+            <a href="mailto:contact@domwillia.ms" title="Contact Me">
+                <span class="hidden">Email</span>
+                <!-- icon from Font Awesome: https://fontawesome.com/license-->
+                <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="envelope"
+                     class="svg-inline--fa fa-envelope fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg"
+                     viewBox="0 0 512 512">
+                    <path fill="currentColor"
+                          d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+                </svg>
+
+            </a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <header>
+        <h1 class="article-title">Devlog #0: vision and goals</h1>
+        <div class="article-date">
+            <time datetime="04-06-2020">04 Jun 2020</time>
+        </div>
+    </header>
+
+    <article>
+        <nav id="toc" class="link5eva">
+            <strong>Table of Contents</strong>
+            <div class="toc">
+<ul>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#goals">Goals</a><ul>
+<li><a href="#deep-simulation">Deep simulation</a></li>
+<li><a href="#intuitive-introspection">Intuitive introspection</a></li>
+<li><a href="#high-performance">High performance</a></li>
+<li><a href="#open-source">Open source</a></li>
+</ul>
+</li>
+<li><a href="#undecided-goals">Undecided goals</a><ul>
+<li><a href="#extent-of-player-control">Extent of player control</a></li>
+<li><a href="#target-of-player-control">Target of player control</a></li>
+<li><a href="#camera-view">Camera view</a></li>
+<li><a href="#modding-support">Modding support</a></li>
+</ul>
+</li>
+<li><a href="#non-goals">Non goals</a></li>
+<li><a href="#progress-so-far">Progress so far</a></li>
+</ul>
+</div>
+
+        </nav>
+
+        <p>This post aims to introduce my ambitious, long-term gamedev project, along with my vision and long term goals for it. In essence, it could be described as a <strong>deep simulation</strong>, not unlike and very much inspired by <strong>Dwarf Fortress</strong> and <strong>Rimworld</strong>. The goal would be to build a society from the ground up in a survival scenario, while managing the needs of the population and overcoming obstacles such as natural disasters.</p>
+<p>In absence of a real name and a fully formed idea of its final form, I've been lovingly referring to it as <em>Name Needed</em>. </p>
+<h2 id="motivation">Motivation</h2>
+<p>The main motivation for this project is to fulfil my dream of creating a dense simulation of interconnecting systems and emergent complexity. It is absolutely a hobby project, worked on only in my spare time around a full time job, without any set deadlines or release dates. I'm writing the game engine from scratch in Rust, a formidable task but one that is incredibly satisfying<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>. </p>
+<h2 id="goals">Goals</h2>
+<p>Although the end product is still very fuzzy, there are a few major goals that form the foundation of the game.</p>
+<h3 id="deep-simulation">Deep simulation</h3>
+<p>The core principle; as much as practicality allows for, <strong>all events, behaviours and actions of the universe's occupants should occur solely as a result of one or more systems</strong>. Predominantly this means avoiding the use of clever tricks to give the impression of depth and intelligence. These are commonly used in commercial games that typically don't revolve around intelligent agents and realistic simulation, instead giving the illusion of intelligence through smoke and mirrors.</p>
+<p>I intend for virtually all aspects of the universe to be procedurally simulated, arising from the interactions between complex systems. Of course, not everything will be fully accurate and true to life, but I aim for very little to be explained by a shrug and "the RNG said so".</p>
+<p>Clearly this is a very ambitious goal, and I acknowledge that full commercial success is very unlikely as a result. Many professional game studios have aspired to include deep and complex systems in their games, and ended up stripping them out completely when <a href="https://www.raphkoster.com/2006/06/03/uos-resource-system">players didn't even notice them</a>. However, with no fixed deadline or final goal, I have plenty of freedom to attempt to achieve my <a href="https://www.gamasutra.com/blogs/TynanSylvester/20130602/193462/The_Simulation_Dream.php">Simulation Dream</a> with little pressure.</p>
+<h3 id="intuitive-introspection">Intuitive introspection</h3>
+<p>There's no point in simulating the entire universe if everything the player sees is indistinguishable from random noise. Therefore I intend for a core part of the game to be based upon <strong>accessible complexity</strong>.</p>
+<p>It should be clear to all what is taking place in the world, what caused it, and the possibly cascading effects those events will have. Most detailed information should be hidden or summarised by default, with very obvious UI controls to expand more detail.</p>
+<p>This in itself is a massive task - good UI design is terribly hard even for professional studios, so a puny solo dev like me is going to have a whopper of a time getting this right. I particularly want to avoid information overload - dumping all internal game data in huge, indecipherable dashboards would definitely count as a cop out.</p>
+<h3 id="high-performance">High performance</h3>
+<p>Care has been taken from the start to produce a well-designed, performant and scalable game engine. For example, using an <em>entity-component-system</em> (ECS) based architecture, cache coherent data structures, and targeted use of concurrency<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>. As with the other goals, this scratches a personal itch and something I find very satisfying to get right.</p>
+<p>Rust makes the arduous challenge of concurrency hilariously easy in comparison to my experiences with other languages. I can be way more daring with my memory and thread usage, haggling with the compiler until one of us decides we're wrong<sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup>.</p>
+<h3 id="open-source">Open source</h3>
+<p>I want the project to be fully open source and free to play. The codebase can be found on <a href="https://github.com/DomWilliams0/name-needed">GitHub</a>. </p>
+<p>In addition, I intend to release various components of the engine as separate engine-agnostic crates, such as the voxel world implementation and AI system. In future posts I'll go into depth about their implementations and interesting technical details and challenges around them.</p>
+<h2 id="undecided-goals">Undecided goals</h2>
+<p>There's still a lot that's unclear about the project, much of which will be pretty critical. I'm still undecided on how to approach these, so for the time being I'm going to dump them here as questions and pretend it's a discussion.</p>
+<h3 id="extent-of-player-control">Extent of player control</h3>
+<p>How much control does the player have over the world?</p>
+<ul>
+<li><strong>Full direct control</strong> - clicking an entity and commanding <em>go to this location</em>, <em>do this action</em></li>
+<li><strong>Full manual control</strong> - using WASD to control the selected entity, otherwise they go around their own business</li>
+<li><strong>Declarative control</strong> - much like other games in this genre; entities are fully autonomous, and juggle a personal task list that includes personal needs and orders from the player</li>
+<li><strong>No control</strong> - spectate only, what a bore</li>
+</ul>
+<h3 id="target-of-player-control">Target of player control</h3>
+<p>Who does the player control?</p>
+<ul>
+<li><strong>Everything and everyone</strong> - players can interfere with the world with godlike powers, spawning animals, starting fires and breaking kneecaps on a whim<sup id="fnref:6"><a class="footnote-ref" href="#fn:6">4</a></sup></li>
+<li><strong>Only humans in the player's society</strong> - other entities like animals can be introspected but not controlled</li>
+<li><strong>A handful of humans in the player's society</strong> - the player controls a small gang out of a larger population</li>
+<li><strong>A single human</strong> - the player only controls one person</li>
+<li><strong>A handful of animals</strong> - e.g. the player directs a pack of wolves to achieve some nefarious goal amongst a human society</li>
+</ul>
+<h3 id="camera-view">Camera view</h3>
+<p>How does the player view the world?</p>
+<ul>
+<li><strong>Top down 2D</strong> - seeing a limited number of vertical slices of the world at a time, with the ability to move the camera up and down</li>
+<li><strong>Fake 3D side-on and others</strong> - e.g. isometric or oblique projection</li>
+<li><strong>Full 3D with AAA graphics, a campaign and FPS minigame</strong> - sorry, just teasing</li>
+</ul>
+<h3 id="modding-support">Modding support</h3>
+<p>How should modding be supported?</p>
+<ul>
+<li><strong>Native shared objects</strong> - powerful but very fragile, and not portable between operating systems and (likely) versions</li>
+<li><strong>High level scripting API</strong> - if game logic was written in a scripting language like Lua/Mun, this could be very powerful and portable</li>
+<li><strong>Data files</strong> - tweaking data files as the only modding "support", the easiest</li>
+<li><strong>Not at all</strong> - just kidding, <em>this</em> would be the easiest option</li>
+</ul>
+<h2 id="non-goals">Non goals</h2>
+<p>There are a few avenues I intend to avoid completely:</p>
+<ul>
+<li><strong>Multiplayer</strong> - it will remain purely single player</li>
+<li><strong>Using a commercial engine</strong> - most of the fun is writing it all myself from the ground up, so a port to Unity or Unreal is out of the question</li>
+</ul>
+<h2 id="progress-so-far">Progress so far</h2>
+<p>I've been working on the project on-and-off since September 2019, and have made reasonable progress on the core engine so far. I will write about many of these topics in the future:</p>
+<ul>
+<li>SDL2 backend with top-down OpenGL rendering</li>
+<li>"Infinite" voxel world in all 3 axes<ul>
+<li>Hierarchical path finding with primitive steering behaviours</li>
+<li>Ambient occlusion</li>
+<li>A fixed number of vertical slices are visible at once, with the ability to scroll up and down in world space</li>
+</ul>
+</li>
+<li>Infinite axis utility system (IAUS) AI<ul>
+<li>Live browser dashboards for introspection during dev</li>
+</ul>
+</li>
+<li>Inventory and item holding system including dominant hands</li>
+<li>Circular little cuties chasing food and wandering about aimlessly</li>
+</ul>
+<p>In the video below, the circles are humans, wandering (path finding to random locations slowly) while their hunger slowly increases. Once they're hungry enough, they eat any food they are holding on their person, or sprint to the nearest food item on the floor to pick up (the green squares). The terrain is pretty boring, with a few nondescript solid colour block types. Near the end of the video, I move the camera view up and down a few vertical slices, hiding the terrain and entities out of view. Beautiful programmer art, don't you think?</p>
+<video controls>
+    <source src="/images/devlog0-progress.mp4" type="video/mp4">
+    There would be a video here but your browser doesn't support it.
+</video>
+
+<p><span class="img_container" style="display: inline-block;"><img alt="Browser dashboard showing the desire to eat for entities in real time" src="/images/devlog0-graph.png" style="display:block; margin-left: auto; margin-right: auto;" title="The browser dashboard showing the desire to eat of entities in real time. It dips, dives and dodges as they consume food, then returns to its steady climb." /><span class="img_caption" style="display: block; text-align: center;">The browser dashboard showing the desire to eat of entities in real time. It dips, dives and dodges as they consume food, then returns to its steady climb.</span></span></p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>The majority of my side projects for the last 5 years have been game engines, made with a variety of technologies. Many are the same ideas churned over and over again, but all in all they cover several distinct aspects of game development. These include <a href="https://github.com/DomWilliams0/city-generator">procedural road generation</a>, <a href="https://github.com/DomWilliams0/voxels-plus-plus">3D voxels</a>, and <a href="https://github.com/DomWilliams0/CitySimulator-python">path-following agents</a>. They all fizzled out eventually, but not without teaching me a great deal.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>By this I mean moving specific tasks (e.g. I/O, terrain generation, path finding) to background worker threads to avoid lagging the main thread, as opposed to blindly throwing threads at the core loop and likely causing data contention issues/overhead.&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:3">
+<p>If it's me who's wrong; thank you compiler, that's hours of debugging saved. But if it's the compiler who's wrong, it takes just a lick of <code>unsafe</code> and a few minutes to show that it was in fact me who was wrong all along.&#160;<a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:6">
+<p>I don't know why, but the first situation I envisage here is watching a helpless villager carrying food between buildings, and deciding everything's going too well. Click the <code>Break kneecaps</code> button. They fall in pain, dropping the bundle. A fellow villager abandons their task of fighting off a feral dog with a stick to run over and starts dragging them home. The dog takes his chances and steals the food, carrying it off in his mouth. <em>Imagine that</em>.&#160;<a class="footnote-backref" href="#fnref:6" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+    </article>
+</main>
+
+<footer>
+    <div class="prev-next">
+    <span><a href="/todos">← The Bane of TODOs</a></span>
+    <span>&nbsp;</span>
+</div>
+
+    <hr/>
+</footer>
+</body>
+</html>
+
