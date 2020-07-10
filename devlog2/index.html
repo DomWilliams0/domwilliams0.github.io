@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+    <title>Devlog #2: game engine architecture</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A deep dive into my game engine architecture, looking at how the simulation is entirely separate from its visual representation."/>
+    <meta name="author" content="Dom Williams">
+    <!--<meta name="keywords" content="rust, gamedev, devlog, name-needed, architecture, game-engine"/>-->
+    <style type="text/css">:root{font-family:"Helvetica Neue",system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:#333;background-color:#fefefe;text-rendering:optimizeLegibility;font-size:16pt}body{max-width:38rem;padding:1rem;margin:auto}video{max-width:35rem;margin:auto;display:block}pre{padding:20px;border-radius:8px;font-size:.9rem;overflow:auto}code{overflow:scroll;overflow-y:auto;overflow-x:auto;font-family:Consolas,Monaco,Andale Mono,Ubuntu Mono,monospace;-webkit-font-feature-settings:normal;-moz-font-feature-settings:normal;font-feature-settings:normal;padding:3px;margin:3px;border-radius:4px;font-weight:400;background:#ececee}pre code{background:none !important;color:#ccc}article{line-height:1.6rem;display:block}p{font-size:1.1rem}blockquote{border-left:2px solid;margin:40px 15px;padding:10px;font-style:italic}@media(max-width:683px){blockquote{margin:10px;padding:10px}}blockquote:before{content:"”";font-family:Georgia,serif;font-size:3.875rem;position:absolute;left:-40px;top:-20px}blockquote p:first-of-type{margin-top:0}blockquote p:last-of-type{margin-bottom:0}.article-date{color:#777;margin-bottom:20px}main header{margin:0}main header h1{margin-bottom:0}.article-title{font-size:2rem}.prev-next{width:100%}.next{float:right}nav#toc ul{list-style-type:disc;padding-left:10px;margin-left:10px}#toc{float:right;margin:0 1.5rem;background-color:#fafafa;padding:.5rem .5rem;border-radius:4px;line-height:1.5rem}#toc a,#toc a:visited{color:#0679a7}@media(max-width:500px){#toc{float:none;margin:auto;width:70%}.header-nav{display:block !important;float:none !important;text-align:center}:root{font-size:12pt}}#blog-header{border-bottom:2px solid #333;margin:0 auto 5px;display:block;overflow:hidden}#blog-header h1{font-size:1.6rem}#blog-header nav{float:right}.link5eva a:visited,.link5eva a{color:var(--color)}#blog-header a{text-decoration:none;display:inline-block}#blog-header a:hover{color:#414141}.header-nav{display:inline;margin:auto;padding:.5rem 0}.icons svg{width:1rem;height:auto;padding:0 10px;color:#111}.footnote,.footnote p{font-size:.9em;font-style:italic;line-height:1.4}.footnote{font-style:normal}.footnote-ref{padding:0 .2rem}.img_container img{max-width:90%;height:auto}.img_caption{text-align:left;font-size:.9em;font-style:italic}.hidden{display:none}</style>
+</head>
+
+<body>
+<header id="blog-header">
+    <div class="link5eva">
+        <h1 class="notalink header-nav"><a href="/" title="Return to root">Dom Williams</a></h1>
+        <nav class="icons header-nav">
+            <a href="/index.xml" title="RSS feed">
+                <span class="hidden">RSS</span>
+                <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>RSS</title>
+                    <path d="M19.199 24C19.199 13.467 10.533 4.8 0 4.8V0c13.165 0 24 10.835 24 24h-4.801zM3.291 17.415c1.814 0 3.293 1.479 3.293 3.295 0 1.813-1.485 3.29-3.301 3.29C1.47 24 0 22.526 0 20.71s1.475-3.294 3.291-3.295zM15.909 24h-4.665c0-6.169-5.075-11.245-11.244-11.245V8.09c8.727 0 15.909 7.184 15.909 15.91z"/>
+                </svg>
+            </a>
+            <a href="https://github.com/DomWilliams0" title="GitHub">
+                <span class="hidden">GitHub</span>
+                <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>GitHub</title>
+                    <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+                </svg>
+            </a>
+            <a href="mailto:contact@domwillia.ms" title="Contact Me">
+                <span class="hidden">Email</span>
+                <!-- icon from Font Awesome: https://fontawesome.com/license-->
+                <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="envelope"
+                     class="svg-inline--fa fa-envelope fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg"
+                     viewBox="0 0 512 512">
+                    <path fill="currentColor"
+                          d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+                </svg>
+
+            </a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <header>
+        <h1 class="article-title">Devlog #2: game engine architecture</h1>
+        <div class="article-date">
+            <time datetime="2020-07-10">10 Jul 2020</time>
+        </div>
+    </header>
+
+    <article>
+        <nav id="toc" class="link5eva">
+            <strong>Table of Contents</strong>
+            <div class="toc">
+<ul>
+<li><a href="#why-bother">Why bother?</a></li>
+<li><a href="#architecture">Architecture</a><ul>
+<li><a href="#the-simulation">The simulation</a><ul>
+<li><a href="#tick">Tick</a></li>
+<li><a href="#render">Render</a></li>
+</ul>
+</li>
+<li><a href="#the-backend">The backend</a><ul>
+<li><a href="#tick_1">Tick</a></li>
+<li><a href="#render_1">Render</a></li>
+<li><a href="#consume-window-events">Consume window events</a></li>
+</ul>
+</li>
+<li><a href="#the-engine">The engine</a></li>
+</ul>
+</li>
+<li><a href="#summary">Summary</a></li>
+</ul>
+</div>
+
+        </nav>
+
+        <p>One of the foundational concepts I've built my <a href="https://github.com/DomWilliams0/name-needed">game engine</a> on is the <strong>separation of concerns</strong>. The game simulation is entirely separate from the rendering, fully agnostic to however it appears to the player and how they interact with it.</p>
+<h2 id="why-bother">Why bother?</h2>
+<p>Keeping the simulation separate from its visual representation is very powerful, and delightfully conceptually clean. It lets you run the game on your continuous integration (CI) server without needing to faff around with trying to get an OpenGL context on a headless VM. In the same vein, it makes it easy to switch between multiple renderer implementations without any code changes at compile time (or runtime if you <em>really</em> wanted to)<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>.</p>
+<p>Other advantages include the ability to fast forward the simulation at hundreds or thousands of ticks per second, and reusing the same simulation code for client- and server-side in networked games.</p>
+<p>Let's get on with it.</p>
+<h2 id="architecture">Architecture</h2>
+<p><span class="img_container" style="display: inline-block;"><img alt="A high-level diagram of the engine architecture" src="/images/devlog2-architecture.svg" style="display:block; margin-left: auto; margin-right: auto;" title="A summary of the engine architecture." /><span class="img_caption" style="display: block; text-align: center;">A summary of the engine architecture.</span></span></p>
+<p>This summarises the architecture of the game engine at a very high level. We'll visit the relevant components in turn, looking at the inputs, outputs and responsibilities of each.</p>
+<h3 id="the-simulation">The simulation</h3>
+<p>The game and all its logic live here. It owns all the entities that live in the game world, the logic and systems that apply to them. It exports 2 main methods to the game engine.</p>
+<h4 id="tick">Tick</h4>
+<p><code>tick(camera, ui_commands)</code></p>
+<p>Advances the simulation a single tick. Note the lack of deltatime/dt - it is totally independent of real-world time or tick rates. The caller is free to decide on its timestep (i.e. 20tps in the game, as fast as possible in tests).</p>
+<p>The simulation is isolated from the outside world, having no way to directly access the player's input e.g. mouse clicks, keypresses. Instead, it is passed a collection of <strong>renderer-agnostic</strong> <code>UiCommand</code>s and <code>InputEvent</code>s on each tick. These are collected by the engine from the backend (via mouse, keyboard, joystick, steering wheel, etc.) in the time between ticks, and processed all at once in the next tick.</p>
+<p>An <code>InputEvent</code> represents a raw input by the player, such as a mouse click on an entity. This is different to an <code>UiCommand</code>, which represents a command issued through UI. See below for a subset of the possible inputs in the engine at the time of writing:</p>
+<div class="code" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #204a87; font-weight: bold">pub</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87; font-weight: bold">enum</span> <span style="color: #000000">InputEvent</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #8f5902; font-style: italic">/// A mouse click in world space</span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #000000">Click</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">MouseButton</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">WorldColumn</span><span style="color: #000000; font-weight: bold">),</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #8f5902; font-style: italic">/// A selection in world space, dragged between two points</span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #000000">Select</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">MouseButton</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">WorldColumn</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">WorldColumn</span><span style="color: #000000; font-weight: bold">),</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #8f5902; font-style: italic">// ...</span>
+<span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #204a87; font-weight: bold">pub</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87; font-weight: bold">enum</span> <span style="color: #000000">UiCommand</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #8f5902; font-style: italic">/// Turns a debug renderer on or off</span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #000000">ToggleDebugRenderer</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">identifier</span>: <span style="color: #204a87; font-weight: bold">&amp;</span><span style="color: #204a87">&#39;static</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87; font-weight: bold">str</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">enabled</span>: <span style="color: #204a87; font-weight: bold">bool</span> <span style="color: #000000; font-weight: bold">},</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #8f5902; font-style: italic">/// Fills the block region selected by the player with the given block type</span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #000000">FillSelectedTiles</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">BlockPlacement</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">BlockType</span><span style="color: #000000; font-weight: bold">),</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #8f5902; font-style: italic">// ...</span>
+<span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+</code></pre></div>
+
+
+<p>The other input parameter is the <code>camera</code> position. The camera itself lives in the backend, and describes the region of the world that is visible to the player<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>. Currently this is used to prioritise visible terrain updates over those that are out of view, but may eventually be used for determining the level of detail (LOD) of the simulation, in which entities that are further away are updated at a slower rate or in coarser detail.</p>
+<p>A brief summary of <code>tick</code>s responsibilities follow:</p>
+<ul>
+<li>Apply terrain updates<sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup></li>
+<li>Act on <code>UiCommand</code>s</li>
+<li>Run entity-component-system (ECS) systems, i.e. the majority of the game logic</li>
+<li>End-of-tick maintenance (applying deferred updates generated by the previous step e.g. insertion/removal of entities)</li>
+</ul>
+<h4 id="render">Render</h4>
+<p><code>render(camera, render_target, interpolation, input_events) -&gt; ui_blackboard</code></p>
+<p>Renders a single frame of the current game state, interpolated with the given <code>interpolation</code> value for smooth movement as covered in the previous <a href="/devlog1">devlog</a>. This allows for rendering the simulation at 60fps while ticking at only 20tps.</p>
+<p>As in <code>tick</code>, the <code>camera</code> input defines the visible area of the world. The simulation is only concerned with rendering <em>entities</em> as opposed to terrain, which is handled by the backend, described below.</p>
+<p>The <code>render_target</code> is a backend-specific struct that implements a common interface for rendering entities. This is passed to a special ECS rendering system<sup id="fnref:4"><a class="footnote-ref" href="#fn:4">4</a></sup>, which in standard ECS fashion iterates over all the entities with a transform (defining position) and render component (defining colour/size/sprite/texture) to produce a list of renderable entities that the backend can draw however it wants.</p>
+<p>The <code>input_event</code>s as described above are resolved to their appropriate selections (e.g. select a single entity, select a region of blocks in the world) by the ECS input system. This system is also run during rendering for increased responsiveness; the player's selection will appear to them in the next frame (in ~16ms at 60fps) rather than the next tick (in ~50ms at 20tps).</p>
+<p>Rendering returns a struct that I've termed the <strong>UI blackboard</strong>. It is simply a structured dump of game data, gathered each frame from the simulation and passed to the UI to be displayed. I've gone with this <strong>push</strong> approach, where the simulation gathers data about itself and <em>push</em>es it to the UI, rather than <strong>pull</strong>ing (the UI queries information from the simulation as it wants) because it helps maintain the conceptual split between the game and its rendering.</p>
+<p>The responsibilities of <code>render</code> can be summarised as below:</p>
+<ul>
+<li>Process raw input events from the player</li>
+<li>Render entities</li>
+<li>Render debug shapes (coloured lines and simple shapes to aid debugging)</li>
+<li>Gather game data for the UI</li>
+</ul>
+<h3 id="the-backend">The backend</h3>
+<p>The backend represents the renderer and is the interface between the player and the game. In this section I will be describing the current concrete implementation that uses SDL2 for window management and event handling, ImGui for the UI, and OpenGL for drawing.</p>
+<h4 id="tick_1">Tick</h4>
+<p><code>tick()</code></p>
+<p>Unbelievable, a simple function signature. Like the simulation, the backend is ticked 20 times per second. Its main responsibility is ticking the camera, moving it around based on user input. The camera's position is treated as any other game object, updated with a fixed timestep but interpolated every frame to result in smooth motion.</p>
+<p>Although the world's terrain data lives in the simulation, its <strong>mesh</strong> (visual representation) lives in the backend. When terrain is modified, the backend needs to regenerate the mesh to represent the change. As an optimisation, only the meshes of terrain regions that are visible to the player are updated.</p>
+<p>A nice, simple summary for a nice, simple method follows:</p>
+<ul>
+<li>Update the camera's position</li>
+<li>Regenerate meshes for visible, modified world regions</li>
+</ul>
+<h4 id="render_1">Render</h4>
+<p><code>render(simulation, interpolation) -&gt; ui_commands</code></p>
+<p>This is where everything the player sees is rendered, i.e. the terrain, the simulation, and the UI. I'll start with the summary this time:</p>
+<ul>
+<li>Clear the window with a solid colour</li>
+<li>Calculate projection and view matrices from the camera's position</li>
+<li>Render the terrain</li>
+<li>Render the simulation (as above), gathering the UI blackboard</li>
+<li>Render the UI, gathering UI commands</li>
+</ul>
+<p>The terrain and entities are rendered at their correct Z coordinate<sup id="fnref:5"><a class="footnote-ref" href="#fn:5">5</a></sup> (i.e. the vertical axis in world space) with depth testing, so the render order technically doesn't matter in this case - terrain overhangs will occlude entities as expected.</p>
+<p>As mentioned above, rendering the simulation produces a <strong>UI blackboard</strong>. This holds information such as the current selected entity, details about them (e.g. hunger, current navigation destination, current activity), and is passed to the UI to be rendered in a simple immediate-mode GUI. Commands issued from the UI are collected and passed to the simulation on the next tick.</p>
+<h4 id="consume-window-events">Consume window events</h4>
+<p><code>consume_events() -&gt; outcome</code></p>
+<p>This is where the backend interacts with the operating system, receiving SDL2 events for clicks/window resizes/keystrokes that are translated into <code>InputEvent</code>s. It is called by the engine at the beginning of each game loop iteration, before any <code>tick</code>ing or <code>render</code>ing. In nearly all cases these window events are handled internally in the backend or simulation, but there are a couple that affect the engine itself - for example, clicking the window close button or sending a <code>SIGINT</code> to the process.</p>
+<p>After handling the queued window events for this frame, an <code>outcome</code> is returned to the engine. This can take one of the following self-explanatory values:</p>
+<ul>
+<li><strong>Continue</strong> - keep running the game</li>
+<li><strong>Exit</strong> - exit the game</li>
+<li><strong>Restart</strong> - destroy the simulation and start a new one</li>
+</ul>
+<h3 id="the-engine">The engine</h3>
+<p>The main job of the engine is simply to call these methods on the backend and simulation, passing data between them. The core of it can be described in Rust-like pseudocode:</p>
+<div class="code" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #8f5902; font-style: italic">// the core game loop</span>
+<span style="color: #204a87; font-weight: bold">loop</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #8f5902; font-style: italic">// handle window events</span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #204a87; font-weight: bold">if</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">backend</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">consume_events</span><span style="color: #000000; font-weight: bold">()</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #8f5902; font-style: italic">// either exit or restart the game</span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #8f5902; font-style: italic">// tick and render as the fixed timestep game loop dictates</span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #204a87; font-weight: bold">for</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">action</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87; font-weight: bold">in</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">game_loop</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">actions</span><span style="color: #000000; font-weight: bold">()</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #204a87; font-weight: bold">match</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">action</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">            </span><span style="color: #000000">FrameAction</span>::<span style="color: #000000">Tick</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">=&gt;</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">                </span><span style="color: #000000">simulation</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">tick</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #ce5c00; font-weight: bold">&amp;</span><span style="color: #000000">camera</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">ui_commands</span><span style="color: #000000; font-weight: bold">);</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">                </span><span style="color: #000000">backend</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">tick</span><span style="color: #000000; font-weight: bold">();</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">            </span><span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">            </span><span style="color: #000000">FrameAction</span>::<span style="color: #000000">Render</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">interpolation</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">=&gt;</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">                </span><span style="color: #000000">ui_commands</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">+=</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">backend</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">render</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #ce5c00; font-weight: bold">&amp;</span><span style="color: #204a87; font-weight: bold">mut</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">simulation</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">interpolation</span><span style="color: #000000; font-weight: bold">);</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">            </span><span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+</code></pre></div>
+
+
+<h2 id="summary">Summary</h2>
+<p>I'm sure you're clamouring to know <em>how exactly</em> the game is initialised and restarts itself, but this post has gone on long enough. In the future I will address this along with the concept of <strong>presets</strong>, which describe how to setup the game in terms of world generation, entity population, etc for different scenarios such as development, testing, and gameplay.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>I use a "lite" no-op renderer implementation that runs the game for 30 seconds as part of the CI test suite without rendering, which can help find low-hanging <code>panic</code>s. It skips the fixed timestep game loop to run as fast as the CPU can manage.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>If you're interested, what I refer to as the camera here actually exists in code as the <a href="https://github.com/DomWilliams0/name-needed/blob/5509ac815c547a0390f3cb35ad0bbb6629f18151/game/world/src/viewer.rs#L10-L14"><code>WorldViewer</code></a>. It is backend-agnostic and tracks the player's 3D viewport of the world. This differs to the <a href="https://github.com/DomWilliams0/name-needed/blob/5509ac815c547a0390f3cb35ad0bbb6629f18151/renderer/engine/src/render/sdl/camera.rs#L9-L17"><code>Camera</code></a>, which is the SDL2 backend's game object representing the player's moving perspective in the world. To keep the needless complexity as low as possible, I will continue to misleadingly refer to the <code>WorldViewer</code> as the camera.&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:3">
+<p>This involves applying occlusion (lighting) updates and posting terrain modifications to the world loader thread pool. This topic will be covered in detail in a future post, and with luck I will update this footnote with a link when the time comes.&#160;<a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:4">
+<p>"Special" here refers to how the system is run every frame during rendering, whereas other normal systems are run in <code>tick</code> as part of the game logic.&#160;<a class="footnote-backref" href="#fnref:4" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:5">
+<p>Actually, this isn't completely true. If everything was rendered at their true Z coordinate in this practically infinite world we would eventually run into floating point inaccuracies with large values that lead to subtle rendering bugs. For example, you may be surprised to find that <code>5000.0_f32 + 0.0001_f32 = 5000.0</code>.  To solve this issue early on, all Z coordinates are uniformly scaled down in order to be close to zero (where the possible floating point values are most densely distributed) while still being correct relative to one another. The same will eventually be needed for X/Y coordinates<sup id="fnref:6"><a class="footnote-ref" href="#fn:6">6</a></sup> as well.&#160;<a class="footnote-backref" href="#fnref:5" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+<li id="fn:6">
+<p>Who knew you could have footnotes inside footnotes? This is the cause of <a href="https://minecraft.gamepedia.com/Far_Lands">Minecraft's Far Lands</a> and is pretty much a non-issue for most players, as problems only occur at ridiculous distances from the world origin.&#160;<a class="footnote-backref" href="#fnref:6" title="Jump back to footnote 6 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+    </article>
+</main>
+
+<footer>
+    <div class="prev-next">
+    <span><a href="/devlog1">← Devlog #1: fixed timestep</a></span>
+    <span>&nbsp;</span>
+</div>
+
+    <hr/>
+</footer>
+</body>
+</html>
+
