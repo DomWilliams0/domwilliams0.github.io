@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+    <title>Devlog #3: entity movement</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A barely coherent rant about a year of progress (or lack thereof) in the realm of entity movement and path finding."/>
+    <meta name="author" content="Dom Williams">
+    <!--<meta name="keywords" content="rust, gamedev, devlog, name-needed, game-engine, steering, behaviour"/>-->
+    <style type="text/css">:root{font-family:"Helvetica Neue",system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:#333;background-color:#fefefe;text-rendering:optimizeLegibility;font-size:16pt}body{max-width:38rem;padding:1rem;margin:auto}video{max-width:35rem;margin:auto;display:block}pre{padding:20px;border-radius:8px;font-size:.9rem;overflow:auto}code{overflow:scroll;overflow-y:auto;overflow-x:auto;font-family:Consolas,Monaco,Andale Mono,Ubuntu Mono,monospace;-webkit-font-feature-settings:normal;-moz-font-feature-settings:normal;font-feature-settings:normal;padding:3px;margin:3px;border-radius:4px;font-weight:400;background:#ececee}pre code{background:none !important;color:#ccc}article{line-height:1.6rem;display:block}p{font-size:1.1rem}blockquote{border-left:2px solid;margin:40px 15px;padding:10px;font-style:italic}@media(max-width:683px){blockquote{margin:10px;padding:10px}}blockquote:before{content:"”";font-family:Georgia,serif;font-size:3.875rem;position:absolute;left:-40px;top:-20px}blockquote p:first-of-type{margin-top:0}blockquote p:last-of-type{margin-bottom:0}.article-date{color:#777;margin-bottom:20px}main header{margin:0}main header h1{margin-bottom:0}.article-title{font-size:2rem}.prev-next{width:100%}.next{float:right}nav#toc ul{list-style-type:disc;padding-left:10px;margin-left:10px}#toc{float:right;margin:0 1.5rem;background-color:#fafafa;padding:.5rem .5rem;border-radius:4px;line-height:1.5rem}#toc a,#toc a:visited{color:#0679a7}@media(max-width:500px){#toc{float:none;margin:auto;width:70%}.header-nav{display:block !important;float:none !important;text-align:center}:root{font-size:12pt}}#blog-header{border-bottom:2px solid #333;margin:0 auto 5px;display:block;overflow:hidden}#blog-header h1{font-size:1.6rem}#blog-header nav{float:right}.link5eva a:visited,.link5eva a{color:var(--color)}#blog-header a{text-decoration:none;display:inline-block}#blog-header a:hover{color:#414141}.header-nav{display:inline;margin:auto;padding:.5rem 0}.icons svg{width:1rem;height:auto;padding:0 10px;color:#111}.footnote,.footnote p{font-size:.9em;font-style:italic;line-height:1.4}.footnote{font-style:normal}.footnote-ref{padding:0 .2rem}.img_container{height:auto;display:block !important}.img_container img{display:inline-block;max-width:90%}.img_caption{text-align:left;font-size:.9em;font-style:italic}.hidden{display:none}</style>
+</head>
+
+<body>
+<header id="blog-header">
+    <div class="link5eva">
+        <h1 class="notalink header-nav"><a href="/" title="Return to root">Dom Williams</a></h1>
+        <nav class="icons header-nav">
+            <a href="/index.xml" title="RSS feed">
+                <span class="hidden">RSS</span>
+                <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>RSS</title>
+                    <path d="M19.199 24C19.199 13.467 10.533 4.8 0 4.8V0c13.165 0 24 10.835 24 24h-4.801zM3.291 17.415c1.814 0 3.293 1.479 3.293 3.295 0 1.813-1.485 3.29-3.301 3.29C1.47 24 0 22.526 0 20.71s1.475-3.294 3.291-3.295zM15.909 24h-4.665c0-6.169-5.075-11.245-11.244-11.245V8.09c8.727 0 15.909 7.184 15.909 15.91z"/>
+                </svg>
+            </a>
+            <a href="https://github.com/DomWilliams0" title="GitHub">
+                <span class="hidden">GitHub</span>
+                <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>GitHub</title>
+                    <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+                </svg>
+            </a>
+            <a href="mailto:contact@domwillia.ms" title="Contact Me">
+                <span class="hidden">Email</span>
+                <!-- icon from Font Awesome: https://fontawesome.com/license-->
+                <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="envelope"
+                     class="svg-inline--fa fa-envelope fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg"
+                     viewBox="0 0 512 512">
+                    <path fill="currentColor"
+                          d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+                </svg>
+
+            </a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <header>
+        <h1 class="article-title">Devlog #3: entity movement</h1>
+        <div class="article-date">
+            <time datetime="2020-08-28">28 Aug 2020</time>
+        </div>
+    </header>
+
+    <article>
+        <nav id="toc" class="link5eva">
+            <strong>Table of Contents</strong>
+            <div class="toc">
+<ul>
+<li><a href="#the-prequels-big-visions">The Prequels - Big visions</a></li>
+<li><a href="#the-dark-times-physics">The Dark Times - Physics</a></li>
+<li><a href="#the-renaissance-return-to-simplicity">The Renaissance - Return to simplicity</a></li>
+<li><a href="#the-can-of-worms-world-modification">The Can of Worms - World modification</a></li>
+<li><a href="#the-comeback-simple-physics">The Comeback - Simple physics</a><ul>
+<li><a href="#context-steering">Context steering</a></li>
+<li><a href="#gravity-2-0">Gravity 2.0</a></li>
+</ul>
+</li>
+<li><a href="#the-present-disobedience">The Present - Disobedience</a></li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ul>
+</div>
+
+        </nav>
+
+        <p>A critical aspect in most games is aesthetic and reliable entity movement across the world. They should be able to follow paths and navigate across the terrain realistically; they shouldn't ghost through things, get wedged in the landscape or bounce uncontrollably off walls. </p>
+<p>That can't be too hard, can it? Yet after a year of development these cretins still can't follow a simple path without messing it up occasionally. This post is a breeze through the dysfunctional history of entity steering in <a href="https://github.com/DomWilliams0/name-needed">my engine</a>.</p>
+<h2 id="the-prequels-big-visions">The Prequels - Big visions</h2>
+<p>Initially the world was simple; entities are floating squares<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>, velocity is <code>(x, y)</code>, position is <code>(x, y, 1.0)</code>. A hardcoded velocity punts them across space with the simple formula <code>pos += vel * speed</code>. Nobody is impressed.</p>
+<p><span class="img_container" style="display: inline-block;"><img alt="GIF of a square moving in a straight line. " src="/images/devlog3/1-simple.gif" style="display:block; margin-left: auto; margin-right: auto;" title="An arrival steering behaviour, back when life was simpler." /><span class="img_caption" style="display: block; text-align: center;">An arrival steering behaviour, back when life was simpler.</span></span></p>
+<p>Now what if they became 3D cuboids, and used real forces to move around? I falsely envisioned that this would be epic and integrated the <a href="https://github.com/bulletphysics/bullet3">Bullet physics engine</a> to produce the monstrosity below<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>. Now they can follow flat paths somewhat mechanically.</p>
+<p>Please excuse the gross, washed out colours, they'll soon be improved. In fact, we'll soon be tossing out all this code in search of simplicity (spoilers!).</p>
+<p><span class="img_container" style="display: inline-block;"><img alt="GIF of boring cuboids sliding around following waypoints." src="/images/devlog3/2-cuboids.gif" style="display:block; margin-left: auto; margin-right: auto;" title="Perhaps the terms &quot;mechanical&quot;, &quot;stiff&quot; and &quot;godawful&quot; spring to mind." /><span class="img_caption" style="display: block; text-align: center;">Perhaps the terms &quot;mechanical&quot;, &quot;stiff&quot; and &quot;godawful&quot; spring to mind.</span></span></p>
+<p>There are so many parameters that can be tweaked here that finding a nice combination takes a long time. Among those many variables is acceleration, maximum speed, and friction. Even after many iterations friction continues to be the worst of all, grounding them at random.</p>
+<p><span class="img_container" style="display: inline-block;"><img alt="GIF of friction halting them in their tracks." src="/images/devlog3/3-friction.gif" style="display:block; margin-left: auto; margin-right: auto;" title="A random subset of the entities happen to have a surface area too great to slide around on this featureless plane. This is not ideal." /><span class="img_caption" style="display: block; text-align: center;">A random subset of the entities happen to have a surface area too great to slide around on this featureless plane. This is not ideal.</span></span></p>
+<p>This all looks a bit unnatural, surely they should face their direction of travel? Attempting to apply just enough angular velocity to turn around and not overshoot or spin endlessly tested my patience enough to scrap forces and manually set their linear and angular velocities by hand. Here starts the slow realisation that a 3D physics engine doesn't fit my requirements.</p>
+<p><span class="img_container" style="display: inline-block;"><img alt="GIF of cuboids turning to face their direction of travel." src="/images/devlog3/4-turning.gif" style="display:block; margin-left: auto; margin-right: auto;" title="Somehow they look even less organic with these very wooden right angle turns." /><span class="img_caption" style="display: block; text-align: center;">Somehow they look even less organic with these very wooden right angle turns.</span></span></p>
+<h2 id="the-dark-times-physics">The Dark Times - Physics</h2>
+<p>Now they can follow paths and turn on the spot; this calls for a few seconds of celebration before substantially moving the goalposts. Colliding with the world is surely of great importance, to avoid glitching through walls and spoiling all the fun? Let's see how that goes.</p>
+<p><span class="img_container" style="display: inline-block;"><img alt="GIF of cuboids pushing against solid blocks and sliding along walls." src="/images/devlog3/5-collision.gif" style="display:block; margin-left: auto; margin-right: auto;" title="They really are making a gallant effort to push through to their destination, I almost feel sorry for them." /><span class="img_caption" style="display: block; text-align: center;">They really are making a gallant effort to push through to their destination, I almost feel sorry for them.</span></span></p>
+<p>Perfect! Although I forgot that the world is 3D and is not entirely flat. How are they going to climb up those ledges? I might as well continue this tragic journey down the physics rabbit hole and let them jump.</p>
+<p>Even though the pathfinding knows about the presence of jumps (it is composed of instructions such as <code>[walk_to(A), jump_up_to(B), jump_down_to(C)]</code>), my first plan was to let them jump any time they see an obstruction in front of them. I gave them invisible collision-detecting sensor cones that would trigger a short, sharp, upwards force when it collides with the world. Doesn't that sound simple and totally watertight (dripping sarcasm intended)?</p>
+<p><span class="img_container" style="display: inline-block;"><img alt="GIF of cuboids bunnyhopping around." src="/images/devlog3/6-bouncing.gif" style="display:block; margin-left: auto; margin-right: auto;" title="The perspective has rotated a bit, to demonstrate what a bunch of crackpots we're dealing with here. Their brains are receiving a constant stream of jump commands, and they are feverishly complying." /><span class="img_caption" style="display: block; text-align: center;">The perspective has rotated a bit, to demonstrate what a bunch of crackpots we're dealing with here. Their brains are receiving a constant stream of jump commands, and they are feverishly complying.</span></span></p>
+<p>As it turns out, this was a terrible idea and a constant source of bugs, such as:</p>
+<ul>
+<li>The sensor should not always intersect with the ground and make them bunnyhop</li>
+<li>The sensor needs to be long enough to give them enough time to actually scale the obstacle before they reach it</li>
+<li>The jump needs to be high enough to scale the obstacle, not just bruise their knees</li>
+<li>But not <em>that</em> high</li>
+<li>The sensor can sometimes brush an obstacle during a turn, causing them to jump unnecessarily and end up in a place they didn't expect</li>
+<li>A jump should not be defined as "go upwards until obstacle is gone" or they become skyrockets</li>
+<li>Glancing at another uncollidable entity is not an excuse to jump/take off</li>
+</ul>
+<h2 id="the-renaissance-return-to-simplicity">The Renaissance - Return to simplicity</h2>
+<p>After a few months away from the project the thought of continuing with this 3D mess was too much to bear. I threw out the physics, forces and the third dimension, and returned to the realm of simple 2D topdown games (although still based in a 3D world). Movement would be implemented with simple vectors representing velocity, acceleration and steering direction - a breath of fresh air.</p>
+<p><span class="img_container" style="display: inline-block;"><img alt="GIF of 2D circles milling around." src="/images/devlog3/7-ragequit.gif" style="display:block; margin-left: auto; margin-right: auto;" title="After so many of those slow, blundering cuboids, it really is refreshing to see these little circles zipping around so smoothly." /><span class="img_caption" style="display: block; text-align: center;">After so many of those slow, blundering cuboids, it really is refreshing to see these little circles zipping around so smoothly.</span></span></p>
+<p>Our primitive 2D shapes have no knowledge of the physical world, only that the path they follow will guide them to their destination<sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup>. As they arrive at each waypoint on their path, their z coordinate (vertical, pointing up towards the screen from their perspective) is set to be 1 above the ground, giving the illusion of "scaling" the world. This is a terrible hack that looks glitchy occasionally, but it gets around the problem of jumping and gravity for now.</p>
+<p>This is far from perfect (or even functional), however. Often these poor souls will overshoot a tiny bit when following a path, just enough that the coordinates rollover from e.g. <code>(5.0, 5.0)</code> to <code>(4.98, 5.0)</code>. This is enough for the pathfinding to decide that it should pathfind from the <strong>solid block</strong> at <code>(4, 5)</code> instead of the accessible space at <code>(5, 5)</code>, which immediately fails. Since there's allegedly no path away, they sit there forever, pitifully bleating in the logs that they're stuck.</p>
+<p>Annoyingly, this is a problem that constantly comes back to haunt me. One "fix" was to try to pathfind from both the <code>floor</code> and <code>ceil</code> of their current position, or from all their adjacent neighbours. This covered up the problem for a short while until it reared its ugly head again. Besides, it was an awful hack - friends don't let friends build game engines out of piles of hacks.</p>
+<p><span class="img_container" style="display: inline-block;"><img alt="GIF of circles glitching out and getting stuck in the world." src="/images/devlog3/8-stuck.gif" style="display:block; margin-left: auto; margin-right: auto;" title="How heart-breaking, they're really giving it their all. Over time they all eventually get wedged in the walls, just like our orange friend in the top left there." /><span class="img_caption" style="display: block; text-align: center;">How heart-breaking, they're really giving it their all. Over time they all eventually get wedged in the walls, just like our orange friend in the top left there.</span></span></p>
+<h2 id="the-can-of-worms-world-modification">The Can of Worms - World modification</h2>
+<p>Adding the ability to break blocks revealed a whole new host of problems. Some will lay low until I get to them (such as aborting and recalculating paths), but others immediately arose and got in the way. For example, when an entity is ordered to break the block they're standing on.</p>
+<p>As soon as this block disappears, they are technically floating for a split second. They took this as a good opportunity to decide they were totally lost (after all, there are now no paths that lead to or from this air block), and hover there for eternity. The need for gravity increases.</p>
+<p><span class="img_container" style="display: inline-block;"><img alt="GIF of circles breaking some blocks, with one getting stuck in midair." src="/images/devlog3/9-float.gif" style="display:block; margin-left: auto; margin-right: auto;" title="They rush to break the blocks in the selected 2x2 region, but greed gets the best of the green one, freezing him in midair. Take it slow, kids." /><span class="img_caption" style="display: block; text-align: center;">They rush to break the blocks in the selected 2x2 region, but greed gets the best of the green one, freezing him in midair. Take it slow, kids.</span></span></p>
+<h2 id="the-comeback-simple-physics">The Comeback - Simple physics</h2>
+<p>At this point it had been a while since our adventures with 3D physics, and I was prepared to take another shot at collision resolution. This time it would be simplified and totally avoid all the issues with full rigid body physics. Unfortunately, it only introduced new problems.</p>
+<p>For testing I set up a nice, perfectly easy situation for our little guy to navigate. He starts out underneath this little staircase, and should swerve out and around the block in front of him to reach his destination - go!</p>
+<p><span class="img_container" style="display: inline-block;"><img alt="GIF of circle attempting to reach the target but is unable to get past the obstacle." src="/images/devlog3/10-strict.gif" style="display:block; margin-left: auto; margin-right: auto;" title="Nothing ever works on the first try." /><span class="img_caption" style="display: block; text-align: center;">Nothing ever works on the first try.</span></span></p>
+<p>It seems the threshold for arriving at each waypoint on the path is more permissive than the collision resolution. We can see that his path of 3 waypoints (go down, left then up) is nearly completed before he is punted back to the start, even through he believes he only has 1 waypoint left to go, which is straight through the solid staircase.</p>
+<p>This is fine, let's just<sup id="fnref:4"><a class="footnote-ref" href="#fn:4">4</a></sup> make the collision resolution a tad more lenient.</p>
+<p><span class="img_container" style="display: inline-block;"><img alt="GIF of circle successfully getting out from under the staircase, but bouncing off the walls on the way." src="/images/devlog3/11-ricochet.gif" style="display:block; margin-left: auto; margin-right: auto;" title="If you reduced everything to 5FPS this might look alright. I'll keep that idea in the back of my mind for when things get really bad." /><span class="img_caption" style="display: block; text-align: center;">If you reduced everything to 5FPS this might look alright. I'll keep that idea in the back of my mind for when things get really bad.</span></span></p>
+<p>Well, at least he arrives where he meant to go, but what a shame about the journey. The thought of attempting to keep debugging and tweaking this to make it just right was triggering at the time, so I decided to try another solution; <strong>avoid</strong> collisions rather than <strong>resolve</strong> them.</p>
+<h3 id="context-steering">Context steering</h3>
+<p>I plan to cover the technical details of steering behaviours at some point in the future, including the concept of <a href="http://www.gameaipro.com/GameAIPro2/GameAIPro2_Chapter18_Context_Steering_Behavior-Driven_Steering_at_the_Macro_Scale.pdf">context steering</a>. In the meantime, it can be summarised as a flexible method of choosing which way to travel based on <strong>interests</strong> and <strong>dangers</strong>.</p>
+<p>The present situation fits these 2 categories well; the direction towards the next waypoint on a path is registered as an interest, and any potential collisions with the world can be registered as a danger. </p>
+<p><span class="img_container" style="display: inline-block;"><img alt="GIF of circle using context steering to avoid colliding with the obstacle." src="/images/devlog3/12-overshoot.gif" style="display:block; margin-left: auto; margin-right: auto;" title="He no longer bounces off the world, avoiding steering into obstacles in the first place. Although the journey is now acceptable, he doesn't actually arrive at his destination. 1 step forward, 1 big bounce backwards." /><span class="img_caption" style="display: block; text-align: center;">He no longer bounces off the world, avoiding steering into obstacles in the first place. Although the journey is now acceptable, he doesn't actually arrive at his destination. 1 step forward, 1 big bounce backwards.</span></span></p>
+<p>It almost works! He successfully steps out from underneath the staircase and marches towards his target! Hold the celebration, though - we have a new problem. Or technically, a new breed of our original problem. He overshoots his target off the step and falls down to the next step; at least, he would if there was gravity. Instead, he finds himself floating above the stairs, thoroughly confused and most certainly incapable of arriving at his destination.</p>
+<p>I guess it's time to add gravity again.</p>
+<h3 id="gravity-2-0">Gravity 2.0</h3>
+<p><em>This</em> time, the physics are vastly simplified. The 2 "forces" can be described as follows:</p>
+<ul>
+<li><code>if floating { pos.z -= 1 }</code></li>
+<li><code>if colliding with world { pos.z += 1 }</code></li>
+</ul>
+<p>That's it; if all of the blocks beneath the entity are air, "fall" down 1 block per tick until the ground is reached, and if any of the blocks occupied by the entity are solid, bubble upwards 1 block per tick until this is no longer true.</p>
+<p>This actually works surprisingly well for its simplicity. Following a path can now ignore jumps/steps and just jam the entity in the direction they're supposed to go, and they will either obey gravity and fall or rise upward and "step up". Has movement finally been solved?</p>
+<p><span class="img_container" style="display: inline-block;"><img alt="GIF of circles wandering around and taking turns to run towards an item, then walking away without picking it up." src="/images/devlog3/13-divebomb.gif" style="display:block; margin-left: auto; margin-right: auto;" title="It seems that these miscreants were raised by crows." /><span class="img_caption" style="display: block; text-align: center;">It seems that these miscreants were raised by crows.</span></span></p>
+<p>As it turns out, it's a good idea to implement both forces together, rather than only the "bubble up" force, otherwise you end up with hilarious bugs like this one. They managed to climb up to the platform on the right but can't come down without gravity. This answers the question "why are they taking turns dive-bombing that food?" - because they're floating 3 metres in the air above it!</p>
+<h2 id="the-present-disobedience">The Present - Disobedience</h2>
+<p>There are still many more problems to deal with. This next one can be described as spontaneous amnesia, or maybe it's just pure stubbornness.</p>
+<p><span class="img_container" style="display: inline-block;"><img alt="GIF of a circle walking towards an item and temporarily giving up half way. " src="/images/devlog3/14-forgetful.gif" style="display:block; margin-left: auto; margin-right: auto;" title="It makes me feel better to blame them for their stupid behaviour rather than the code. I'm sure they do it on purpose." /><span class="img_caption" style="display: block; text-align: center;">It makes me feel better to blame them for their stupid behaviour rather than the code. I'm sure they do it on purpose.</span></span></p>
+<p>This is the bug I'm grappling with at the time of writing, caused again by their attempting to pathfind from their <em>exact</em> position. Here, he is sprinting towards the food on that ledge, and in the split second that he is jumping/stepping up he happens to reconsider his life choices. As he is currently floating in midair, he decides that there is no food accessible from his position and wanders away instead. A second later, he joyfully discovers there is food only a few metres away, and runs to pick it up. </p>
+<p>The solution I have in mind is to keep track of the last accessible occupied space and use <em>that</em> for navigation, rather than the possibly-midair exact position. Maybe this will bury this bug for a few weeks before it reappears under a different guise.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>I've ranted about a lot here, and you could even pretend it was all with purpose and boils down to a handful of widely applicable life lessons:</p>
+<ul>
+<li><strong>Think on major architectural decisions</strong> - don't churn out thousands of lines of code on a whim. Even if the time budget for this project is "infinite", motivation and resources are not.</li>
+<li><strong>Not all games need perfect collisions and physics</strong> - For this type of game, overlap with walls and other entities is fine, especially as the player does not have direct control over entities.</li>
+<li><strong>Keep moving forward</strong> - if it kinda works, move on to the next thing. Leave some TODOs if you know how you could improve it in the future. You don't want to end up with a perfect entity walking simulator and no game in 5 years.</li>
+<li><strong>Bugs get funnier as the game gets more complex</strong> - Logic bugs can now be blamed on the stupidity and vanity of the minions. Why can't they just do what I tell them?</li>
+</ul>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>Indeed, everything still uses primitive shapes today, but there's a lot more to them behind the scenes. One day entities might even be composed of <em>multiple</em> primitive shapes.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>the game engine is Rust but Bullet is C++, so joining them together over the FFI boundary (and bolting the bridging code generation into Cargo) was a good chunk of work. One day I will write about the ridiculous amount of churn this project has been through.&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:3">
+<p>Wow, it's getting spiritual in here.&#160;<a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:4">
+<p>I apologise if this casual use of the word "just" triggered some bad memories. "Why don't you <strong>just</strong> implement 2D physics?". "Make them <strong>just</strong> avoid collisions". "<strong>Just</strong> make them smart". (╯°□°)╯︵ ┻━┻ In this case, <strong>just</strong> tweaking collision resolution took several hours.&#160;<a class="footnote-backref" href="#fnref:4" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+    </article>
+</main>
+
+<footer>
+    <div class="prev-next">
+    <span><a href="/devlog2">← Devlog #2: game engine architecture</a></span>
+    <span>&nbsp;</span>
+</div>
+
+    <hr/>
+</footer>
+</body>
+</html>
+
