@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+    <title>Devlog #4: entity activities</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A technical dive into how living entities do the things the brain tells them to do without crippling game performance."/>
+    <meta name="author" content="Dom Williams">
+    <!--<meta name="keywords" content="rust, gamedev, devlog, name-needed, game-engine, ai, behaviour, activity"/>-->
+    <style type="text/css">:root{font-family:"Helvetica Neue",system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:#333;background-color:#fefefe;text-rendering:optimizeLegibility;font-size:16pt}body{max-width:38rem;padding:1rem;margin:auto}video{max-width:35rem;margin:auto;display:block}pre{padding:20px;border-radius:8px;font-size:.9rem;overflow:auto}code{overflow:scroll;overflow-y:auto;overflow-x:auto;font-family:Consolas,Monaco,Andale Mono,Ubuntu Mono,monospace;-webkit-font-feature-settings:normal;-moz-font-feature-settings:normal;font-feature-settings:normal;padding:3px;margin:3px;border-radius:4px;font-weight:400;background:#ececee}pre code{background:none !important;color:#ccc}article{line-height:1.6rem;display:block}p{font-size:1.1rem}blockquote{border-left:2px solid;margin:40px 15px;padding:10px;font-style:italic}@media(max-width:683px){blockquote{margin:10px;padding:10px}}blockquote:before{content:"”";font-family:Georgia,serif;font-size:3.875rem;position:absolute;left:-40px;top:-20px}blockquote p:first-of-type{margin-top:0}blockquote p:last-of-type{margin-bottom:0}.article-date{color:#777;margin-bottom:20px}main header{margin:0}main header h1{margin-bottom:0}.article-title{font-size:2rem}.prev-next{width:100%}.next{float:right}nav#toc ul{list-style-type:disc;padding-left:10px;margin-left:10px}#toc{float:right;margin:0 1.5rem;background-color:#fafafa;padding:.5rem .5rem;border-radius:4px;line-height:1.5rem}#toc a,#toc a:visited{color:#0679a7}@media(max-width:500px){#toc{float:none;margin:auto;width:70%}.header-nav{display:block !important;float:none !important;text-align:center}:root{font-size:12pt}}#blog-header{border-bottom:2px solid #333;margin:0 auto 5px;display:block;overflow:hidden}#blog-header h1{font-size:1.6rem}#blog-header nav{float:right}.link5eva a:visited,.link5eva a{color:var(--color)}#blog-header a{text-decoration:none;display:inline-block}#blog-header a:hover{color:#414141}.header-nav{display:inline;margin:auto;padding:.5rem 0}.icons svg{width:1rem;height:auto;padding:0 10px;color:#111}.footnote,.footnote p{font-size:.9em;font-style:italic;line-height:1.4}.footnote{font-style:normal}.footnote-ref{padding:0 .2rem}.img_container{height:auto;display:block !important}.img_container img{display:inline-block;max-width:90%}.img_caption{text-align:left;font-size:.9em;font-style:italic}.hidden{display:none}</style>
+</head>
+
+<body>
+<header id="blog-header">
+    <div class="link5eva">
+        <h1 class="notalink header-nav"><a href="/" title="Return to root">Dom Williams</a></h1>
+        <nav class="icons header-nav">
+            <a href="/index.xml" title="RSS feed">
+                <span class="hidden">RSS</span>
+                <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>RSS</title>
+                    <path d="M19.199 24C19.199 13.467 10.533 4.8 0 4.8V0c13.165 0 24 10.835 24 24h-4.801zM3.291 17.415c1.814 0 3.293 1.479 3.293 3.295 0 1.813-1.485 3.29-3.301 3.29C1.47 24 0 22.526 0 20.71s1.475-3.294 3.291-3.295zM15.909 24h-4.665c0-6.169-5.075-11.245-11.244-11.245V8.09c8.727 0 15.909 7.184 15.909 15.91z"/>
+                </svg>
+            </a>
+            <a href="https://github.com/DomWilliams0" title="GitHub">
+                <span class="hidden">GitHub</span>
+                <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>GitHub</title>
+                    <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+                </svg>
+            </a>
+            <a href="mailto:contact@domwillia.ms" title="Contact Me">
+                <span class="hidden">Email</span>
+                <!-- icon from Font Awesome: https://fontawesome.com/license-->
+                <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="envelope"
+                     class="svg-inline--fa fa-envelope fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg"
+                     viewBox="0 0 512 512">
+                    <path fill="currentColor"
+                          d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+                </svg>
+
+            </a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <header>
+        <h1 class="article-title">Devlog #4: entity activities</h1>
+        <div class="article-date">
+            <time datetime="2020-11-21">21 Nov 2020</time>
+        </div>
+    </header>
+
+    <article>
+        <nav id="toc" class="link5eva">
+            <strong>Table of Contents</strong>
+            <div class="toc">
+<ul>
+<li><a href="#activities">Activities</a><ul>
+<li><a href="#tick-frequency">Tick frequency</a></li>
+<li><a href="#polling-considered-harmful">Polling considered harmful</a></li>
+</ul>
+</li>
+<li><a href="#activity-lifecycle">Activity lifecycle</a><ul>
+<li><a href="#active-state">Active state</a></li>
+<li><a href="#blocking-state">Blocking state</a></li>
+<li><a href="#finished-state">Finished state</a></li>
+</ul>
+</li>
+<li><a href="#subactivities">Subactivities</a></li>
+<li><a href="#summary">Summary</a></li>
+</ul>
+</div>
+
+        </nav>
+
+        <p>Living entities are always doing <em>something</em>, otherwise they're no different from their inanimate counterparts. In the game, as in real life, the brain decides what to do and commands the body to actually do it. The AI system represents the brain, which for now can be treated as a black box that emits decisions, and will get its own post in the future. This post covers the body, or <strong>activity system</strong>, its design, and how it's implemented.</p>
+<h2 id="activities">Activities</h2>
+<p>Each entity tracks the <strong>activity</strong> that they're currently working on, which describes the high level behaviour. For example: go and break that block, or go pick up that item and put it in that chest over there, or omg drop everything and run away from that threat. </p>
+<p>There can only be a single activity active at a time, which can be gracefully interrupted if a higher priority need arises. I plan to let entities do some number of unrelated concurrent tasks eventually (e.g. haul something while going somewhere for a different reason), but that's a long way off - the game should actually be playable first.</p>
+<p><span class="img_container" style="display: inline-block;"><img alt="GIF showing some entities walking around doing various activities." src="/images/devlog4-bumbling.gif" style="display:block; margin-left: auto; margin-right: auto;" title="Watch them bumble around hauling things to a chest and digging a hole. This is the majority of the activities implemented so far, with a million more well on the way." /><span class="img_caption" style="display: block; text-align: center;">Watch them bumble around hauling things to a chest and digging a hole. This is the majority of the activities implemented so far, with a million more well on the way.</span></span></p>
+<h3 id="tick-frequency">Tick frequency</h3>
+<p>The system that handles activities for every entity is ticked every game tick, as it's the main <strong>observable</strong> behaviour of an entity. Any latency by only ticking it occasionally would certainly be obvious to the player.</p>
+<p>The AI system, however, is ticked less often (every half second/10 game ticks), because considering all possible behaviours and choosing the best is quite an intensive operation. Reevaluating their life choices as often as 20 times a second would be burning a huge amount of cycles for not much gain, so slowing it down (or even staggering a few entities at a time across multiple frames) gives us a large chunk of the frame budget back at the small cost of entities being slightly slower to react to the world.</p>
+<p>I think this is an obvious trade-off to take, given the depth of complexity this game will eventually have. The small impact on reaction time of living entities will barely be noticeable if at all, but the stuttering lag after having more than 10 alive definitely would. </p>
+<h3 id="polling-considered-harmful">Polling considered harmful</h3>
+<p>Supporting a large number of living entities across the world is a key goal for this project. This comes with the need to cut down on any unnecessary work each tick. An obvious place to start here is avoid <strong>polling for completion per-entity per-tick</strong>.</p>
+<p>Consider the activity "go to this position and break this block with this tool in your bag". A naive implementation would have the activity poll to check 1) are we there yet 2) have we got that tool in our hand yet 3) is the block broken yet, every tick. If the block is far away, we would be wasting a lot of cycles checking the distance constantly. The path following system already knows how to travel to a block and when it's arrived, so can we harness this to let us know when instead of asking non-stop?</p>
+<p>Absolutely<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> - using an event-driven architecture, we can just wait around doing nothing until the engine notifies us of something happening. Consider the diagram below:</p>
+<p><span class="img_container" style="display: inline-block;"><img alt="Diagram comparing polling to an event-driven architecture." src="/images/devlog4-blocking.svg" style="display:block; margin-left: auto; margin-right: auto;" title="As you can see, polling sucks and will make your dad turn this car around if you don't stop asking!" /><span class="img_caption" style="display: block; text-align: center;">As you can see, polling sucks and will make your dad turn this car around if you don't stop asking!</span></span></p>
+<p>This illustrates 2 separate timelines for the same activity, which has the entity walk to a block and break it. Each vertical line represents a game tick where this activity is updated/runs code.</p>
+<p>The upper timeline shows the polling implementation, which is busily querying the world to check for completion each tick. Each individual check may not be too expensive but adds up if every living entity is doing the same constantly. Won't somebody please think of the <s>children</s> cycles?!</p>
+<p>The lower is a much more pleasant sight; the activity only ever needs to do something when the previous step is complete. While the entity is travelling or punching there's no extra work to be done, freeing up a lot of cycles. Even better, the activity overhead is <em>constant</em> regardless of its duration! That is, the destination could be thousands of blocks away or 5, and the work required is just as low.</p>
+<p>Here are some examples of events to help put the following section into context:</p>
+<div class="code" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #204a87; font-weight: bold">pub</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87; font-weight: bold">enum</span> <span style="color: #000000">EventPayload</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #8f5902; font-style: italic">/// Path finding ended</span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #000000">Arrived</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #204a87">Result</span><span style="color: #ce5c00; font-weight: bold">&lt;</span><span style="color: #000000">WorldPoint</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">NavigationError</span><span style="color: #ce5c00; font-weight: bold">&gt;</span><span style="color: #000000; font-weight: bold">),</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #8f5902; font-style: italic">/// Item entity (the subject) picked up by the given holder</span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #000000">PickedUp</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #204a87">Result</span><span style="color: #ce5c00; font-weight: bold">&lt;</span><span style="color: #000000">Entity</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">PickupItemError</span><span style="color: #ce5c00; font-weight: bold">&gt;</span><span style="color: #000000; font-weight: bold">),</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #8f5902; font-style: italic">/// Food entity has been fully eaten</span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #000000">Eaten</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #204a87">Result</span><span style="color: #ce5c00; font-weight: bold">&lt;</span><span style="color: #000000; font-weight: bold">(),</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">()</span><span style="color: #ce5c00; font-weight: bold">&gt;</span><span style="color: #000000; font-weight: bold">),</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #8f5902; font-style: italic">/// Item entity (subject) has been equipped in the inventory of the given entity</span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #000000">Equipped</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #204a87">Result</span><span style="color: #ce5c00; font-weight: bold">&lt;</span><span style="color: #000000">Entity</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">EquipItemError</span><span style="color: #ce5c00; font-weight: bold">&gt;</span><span style="color: #000000; font-weight: bold">),</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #8f5902; font-style: italic">// ...</span>
+<span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+</code></pre></div>
+
+
+<h2 id="activity-lifecycle">Activity lifecycle</h2>
+<p><span class="img_container" style="display: inline-block;"><img alt="State machine for activities." src="/images/devlog4-activity-states.svg" style="display:block; margin-left: auto; margin-right: auto;" title="The basic lifecycle of an activity, and the possible states it can be in." /><span class="img_caption" style="display: block; text-align: center;">The basic lifecycle of an activity, and the possible states it can be in.</span></span></p>
+<h4 id="active-state">Active state</h4>
+<p>The activity is initially active, and ticked each game tick it's in this state. The function signature is roughly <code>fn on_tick(&amp;mut self, world: &amp;EcsWorld, subscriptions: &amp;mut Vec&lt;Subscription&gt;) -&gt; ActivityResult)</code>. Breaking this down:</p>
+<ul>
+<li><code>&amp;mut self</code>: It can mutate its internal state.</li>
+<li><code>world: &amp;EcsWorld</code>: An immutable reference to the world. Through this it can query the world and queue up mutable updates for the following tick (e.g. adding components, creating new entities).</li>
+<li><code>subscriptions: &amp;mut Vec&lt;Subscription&gt;</code>: A means of subscribing to specific events about a specific entity, this is covered in more detail below. </li>
+<li><code>-&gt; ActivityResult</code>: The return value is one of the following:<ul>
+<li><code>Ongoing</code>: Remain in the active state and get ticked again next tick</li>
+<li><code>Finished(FinishType)</code>: This activity has finished. The type of finish is one of <code>Success</code>, <code>Failure(Error)</code> or <code>Interrupted</code>, and influences how the game continues. For example, if interrupted maybe this activity should be considered again in the near future, or if unsuccessful try something different.</li>
+<li><code>Blocked</code>: put this activity in the blocking state and don't tick until it's active again, see below.</li>
+</ul>
+</li>
+</ul>
+<h4 id="blocking-state">Blocking state</h4>
+<p>The activity is inactive and waiting on the events it subscribed to when <code>on_tick</code> transitioned it to this state. When events are emitted by the game engine, they are passed to a function with the rough signature <code>fn on_event(&amp;mut self, event: &amp;EventPayload, subject: Entity) -&gt; (UnblockResult, UnsubscribeResult)</code>. Breaking this down too:</p>
+<ul>
+<li><code>&amp;mut self</code>: As before, it can mutate its internal state. This is essential before passing control flow back to <code>on_tick</code> in the active state.</li>
+<li><code>event: &amp;EventPayload</code>: The triggering event. This is the payload represented by the enum above, and holds the event type and any additional context, such as if the entity actually arrived at its destination or if navigation was aborted or failed.</li>
+<li><code>subject: Entity</code>: The entity that this event related to, for example who has arrived at his destination, or the item that has been equipped.</li>
+<li><code>-&gt; (UnblockResult, UnsubscribeResult)</code>: The return value indicates if the activity should return to the active state (or remain blocked), and if its event subscriptions should be cleared. </li>
+</ul>
+<p>Event subscriptions are based on the subject entity and event type of interest. The "go to destination" activity would subscribe only to the <code>Arrived</code> event with the travelling entity as the subject, whereas the "pick up item" activity would be interested in all events relating to the item in question, to detect if it has already been picked up or consumed or made inaccessible in some way.</p>
+<p>In a large world there will be possibly hundreds of events being fired off each tick. It would be a waste to go through all this effort to avoid polling activities just to quadratically run every event past every blocking activity. Therefore care is taken that only events about pertinent entities are passed to an interested activity<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>. Events about entities that no-one is interested in are dropped on the floor immediately.</p>
+<p>An important point to note about the event handler is that <strong>there is no reference to the world</strong>. The function is isolated from the game engine and cannot affect any state outside of the activity. This simplifies the state machine and ensures all "real work" is done in only one place, in <code>on_tick</code>.</p>
+<p>The power of the ECS architecture means that a blocked activity really is "asleep" and does not incur any overhead while ticking the active ones each tick<sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup>. This is indicated with the addition of a zero-sized component <code>BlockingActivityComponent</code> to the entity. The component requires no storage and membership boils down to a blazing fast bitset check.</p>
+<h4 id="finished-state">Finished state</h4>
+<p>Technically this is a third state but it's a very simple one. When an activity ends gracefully, fails, or is interrupted its <code>on_finish</code> method is called, which allows it to clean up before yielding to the new activity. This is passed a reference to the <code>EcsWorld</code> like <code>on_tick</code>, so it's able to mutate the world if necessary.</p>
+<p>An interesting implementation is that of the hauling subactivity, where an entity carries another item to a destination. If this finishes successfully the item should be placed as desired (on the ground or in a container), but if it's interrupted then the item may be dropped to the floor instead.</p>
+<h2 id="subactivities">Subactivities</h2>
+<p>Many activities share common behaviours such as "walk here" or "pick this up", which can be implemented once and reused across activities. These primitives are known as <strong>subactivities</strong>, and implement most of the actual work that an activity does. This reduces the responsibilities of an activity to simply:</p>
+<ol>
+<li>Determine control flow, i.e. which subactivities to delegate to, and when it's finished</li>
+<li>Handle events to manage internal state</li>
+</ol>
+<p>An added benefit is that the player can more clearly see what an entity is doing at any time; in the UI they see both a high level description (the activity) and the current task (the subactivity), as in the GIF below.</p>
+<p><span class="img_container" style="display: inline-block;"><img alt="GIF of an entity hauling an item to a container, showing the current activity and subactivity in the UI. " src="/images/devlog4-subactivity.gif" style="display:block; margin-left: auto; margin-right: auto;" title="The main activity here is to haul entity E1:4 (the item) into the chest entity E1:6, and this remains the case throughout. The subactivity display shows the separate parts of the job - going to the item, picking it up, then carrying it to the chest." /><span class="img_caption" style="display: block; text-align: center;">The main activity here is to haul entity E1:4 (the item) into the chest entity E1:6, and this remains the case throughout. The subactivity display shows the separate parts of the job - going to the item, picking it up, then carrying it to the chest.</span></span></p>
+<h2 id="summary">Summary</h2>
+<p>Watch this space for a follow-up post on how the AI system makes its decisions. If you're working on a similar system, I hope this can save you some time and code churn!</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>If you were expecting a sad Consuela meme here, sorry to disappoint.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>The code for passing events around can be found <a href="https://github.com/DomWilliams0/name-needed/blob/bab71746c3cebe6f05b270338a54de1fb6d3051c/game/simulation/src/event/queue.rs#L111-L197">here</a> if you're interested.&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:3">
+<p>A naive implementation might have a <code>is_blocked</code> flag in each activity and starts <code>on_tick</code> with a <code>if self.is_blocked { return; }</code>. The overhead of a function call and likely branch misprediction for every activity is a waste of our precious frame budget and could have a noticeable effect in large, busy worlds.&#160;<a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+    </article>
+</main>
+
+<footer>
+    <div class="prev-next">
+    <span><a href="/devlog3">← Devlog #3: entity movement</a></span>
+    <span>&nbsp;</span>
+</div>
+
+    <hr/>
+</footer>
+</body>
+</html>
+
