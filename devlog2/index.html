@@ -83,7 +83,7 @@
 <p>Other advantages include the ability to fast forward the simulation at hundreds or thousands of ticks per second, and reusing the same simulation code for client- and server-side in networked games.</p>
 <p>Let's get on with it.</p>
 <h2 id="architecture">Architecture</h2>
-<p><span class="img_container" style="display: inline-block;"><img alt="A high-level diagram of the engine architecture" src="/images/devlog2-architecture.svg" style="display:block; margin-left: auto; margin-right: auto;" title="A summary of the engine architecture." /><span class="img_caption" style="display: block; text-align: center;">A summary of the engine architecture.</span></span></p>
+<p><span class="img_container" style="display: inline-block;"><img alt="A high-level diagram of the engine architecture" src="https://domwilliams0.github.io/images/devlog2-architecture.svg" style="display:block; margin-left: auto; margin-right: auto;" title="A summary of the engine architecture." /><span class="img_caption" style="display: block; text-align: center;">A summary of the engine architecture.</span></span></p>
 <p>This summarises the architecture of the game engine at a very high level. We'll visit the relevant components in turn, looking at the inputs, outputs and responsibilities of each.</p>
 <h3 id="the-simulation">The simulation</h3>
 <p>The game and all its logic live here. It owns all the entities that live in the game world, the logic and systems that apply to them. It exports 2 main methods to the game engine.</p>
