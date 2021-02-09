@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+    <title>Application-wide panic handling</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Panics in Rust are normally isolated to the thread that caused them, and are sometimes recoverable. This post introduces panik-rs, a crate to make panics on all threads fatal (to the application!) and prevent them from being silently swallowed."/>
+    <meta name="author" content="Dom Williams">
+    <!--<meta name="keywords" content="rust, panic, panic-handling, gamedev, name-needed, game-engine"/>-->
+    <style type="text/css">:root{font-family:"Helvetica Neue",system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:#333;background-color:#fefefe;text-rendering:optimizeLegibility;font-size:16pt}body{max-width:38rem;padding:1rem;margin:auto}video{max-width:35rem;margin:auto;display:block}pre{padding:20px;border-radius:8px;font-size:.9rem;overflow:auto}code{overflow:scroll;overflow-y:auto;overflow-x:auto;font-family:Consolas,Monaco,Andale Mono,Ubuntu Mono,monospace;-webkit-font-feature-settings:normal;-moz-font-feature-settings:normal;font-feature-settings:normal;padding:3px;margin:3px;border-radius:4px;font-weight:400;background:#ececee}pre code{background:none !important;color:#ccc}article{line-height:1.6rem;display:block}p{font-size:1.1rem}blockquote{border-left:2px solid;margin:40px 15px;padding:10px;font-style:italic}@media(max-width:683px){blockquote{margin:10px;padding:10px}}blockquote:before{content:"”";font-family:Georgia,serif;font-size:3.875rem;position:absolute;left:-40px;top:-20px}blockquote p:first-of-type{margin-top:0}blockquote p:last-of-type{margin-bottom:0}.article-date{color:#777;margin-bottom:20px}main header{margin:0}main header h1{margin-bottom:0}.article-title{font-size:2rem}.prev-next{width:100%}.next{float:right}nav#toc ul{list-style-type:disc;padding-left:10px;margin-left:10px}#toc{float:right;margin:0 1.5rem;background-color:#fafafa;padding:.5rem .5rem;border-radius:4px;line-height:1.5rem}#toc a,#toc a:visited{color:#0679a7}@media(max-width:500px){#toc{float:none;margin:auto;width:70%}.header-nav{display:block !important;float:none !important;text-align:center}:root{font-size:12pt}}#blog-header{border-bottom:2px solid #333;margin:0 auto 5px;display:block;overflow:hidden}#blog-header h1{font-size:1.6rem}#blog-header nav{float:right}.link5eva a:visited,.link5eva a{color:var(--color)}#blog-header a{text-decoration:none;display:inline-block}#blog-header a:hover{color:#414141}.header-nav{display:inline;margin:auto;padding:.5rem 0}.icons svg{width:1rem;height:auto;padding:0 10px;color:#111}.footnote,.footnote p{font-size:.9em;font-style:italic;line-height:1.4}.footnote{font-style:normal}.footnote-ref{padding:0 .2rem}.img_container{height:auto;display:block !important}.img_container img{display:inline-block;max-width:90%}.img_caption{text-align:left;font-size:.9em;font-style:italic}.hidden{display:none}</style>
+</head>
+
+<body>
+<header id="blog-header">
+    <div class="link5eva">
+        <h1 class="notalink header-nav"><a href="/" title="Return to root">Dom Williams</a></h1>
+        <nav class="icons header-nav">
+            <a href="/index.xml" title="RSS feed">
+                <span class="hidden">RSS</span>
+                <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>RSS</title>
+                    <path d="M19.199 24C19.199 13.467 10.533 4.8 0 4.8V0c13.165 0 24 10.835 24 24h-4.801zM3.291 17.415c1.814 0 3.293 1.479 3.293 3.295 0 1.813-1.485 3.29-3.301 3.29C1.47 24 0 22.526 0 20.71s1.475-3.294 3.291-3.295zM15.909 24h-4.665c0-6.169-5.075-11.245-11.244-11.245V8.09c8.727 0 15.909 7.184 15.909 15.91z"/>
+                </svg>
+            </a>
+            <a href="https://github.com/DomWilliams0" title="GitHub">
+                <span class="hidden">GitHub</span>
+                <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>GitHub</title>
+                    <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+                </svg>
+            </a>
+            <a href="mailto:contact@domwillia.ms" title="Contact Me">
+                <span class="hidden">Email</span>
+                <!-- icon from Font Awesome: https://fontawesome.com/license-->
+                <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="envelope"
+                     class="svg-inline--fa fa-envelope fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg"
+                     viewBox="0 0 512 512">
+                    <path fill="currentColor"
+                          d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+                </svg>
+
+            </a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <header>
+        <h1 class="article-title">Application-wide panic handling</h1>
+        <div class="article-date">
+            <time datetime="2021-02-09">09 Feb 2021</time>
+        </div>
+    </header>
+
+    <article>
+        <nav id="toc" class="link5eva">
+            <strong>Table of Contents</strong>
+            <div class="toc">
+<ul>
+<li><a href="#all-panics-are-terminal">All panics are terminal</a></li>
+<li><a href="#the-pain-of-silent-panics">The pain of silent panics</a></li>
+<li><a href="#panik-rs-to-the-rescue">panik-rs to the rescue</a><ul>
+<li><a href="#example-in-context">Example in context</a></li>
+<li><a href="#before-after-comparison">Before/after comparison</a></li>
+</ul>
+</li>
+<li><a href="#watch-out-for-async-runtimes">Watch out for async runtimes</a></li>
+<li><a href="#summary">Summary</a></li>
+</ul>
+</div>
+
+        </nav>
+
+        <p>A <a href="https://doc.rust-lang.org/std/macro.panic.html">panic</a> in Rust is the final resort when the code reaches an erroneous or impossible state. The stack of the thread it occurred on is unwound, every value that falls out of scope <a href="https://doc.rust-lang.org/reference/destructors.html">dropped</a>, and the thread terminated. This is isolated to that specific thread<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>, which allows other threads to detect and gracefully handle the error condition by e.g. spawning a new thread to replace it, or logging and exiting cleanly.</p>
+<p>In most programs this is pretty useful, but I've been tripped up enough by this behaviour in my <a href="https://github.com/DomWilliams0/name-needed">game engine</a> to warrant implementing an alternate method of panic handling.</p>
+<h2 id="all-panics-are-terminal">All panics are terminal</h2>
+<p>Ideally, no panics should ever occur. Clearly this isn't possible, so I'm striving for the next best thing - <strong>immediate detection and graceful shutdown</strong>. Any panic on any thread should be treated as a hard error, and the main thread should attempt to save all game data and exit as soon as possible. </p>
+<p>This provides the benefit of increased confidence in finding error conditions during testing, especially automated end-to-end tests where the game is run headless with debug asserts enabled. I've been bitten by this many times, when a worker thread panics but the main thread continues on oblivious, exiting cleanly and marking the test as a "success". It can be frustrating to hunt down bugs like these where the error is swallowed and silently breaks things<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>, as I describe in the section below.</p>
+<h2 id="the-pain-of-silent-panics">The pain of silent panics</h2>
+<p>My game engine makes heavy use of thread pools to process expensive workloads over several ticks without affecting the frame rate - examples include generating chunks of terrain, or calculating paths for <a href="/devlog3">navigation</a>. The main thread will post work to the thread pool via a <a href="https://doc.rust-lang.org/std/sync/mpsc/">channel</a>, then consume available results each tick, all without blocking. A pseudo-code example:</p>
+<div class="code" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #8f5902; font-style: italic">// set up channels</span>
+<span style="color: #204a87; font-weight: bold">let</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">request_tx</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">request_rx</span><span style="color: #000000; font-weight: bold">)</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">=</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">channel</span><span style="color: #000000; font-weight: bold">();</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #204a87; font-weight: bold">let</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">result_tx</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">result_rx</span><span style="color: #000000; font-weight: bold">)</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">=</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">channel</span><span style="color: #000000; font-weight: bold">();</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #8f5902; font-style: italic">// spawn worker thread</span>
+<span style="color: #000000">std</span>::<span style="color: #000000">thread</span>::<span style="color: #000000">spawn</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #204a87; font-weight: bold">move</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">||</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #204a87; font-weight: bold">while</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87; font-weight: bold">let</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87">Ok</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">req</span><span style="color: #000000; font-weight: bold">)</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">=</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">request_rx</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">recv</span><span style="color: #000000; font-weight: bold">()</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #8f5902; font-style: italic">// process request (potentially taking a long time)</span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #8f5902; font-style: italic">// and post response back</span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #204a87; font-weight: bold">let</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">result</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">=</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">do_work</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">req</span><span style="color: #000000; font-weight: bold">);</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #000000">result_tx</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">send</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">result</span><span style="color: #000000; font-weight: bold">).</span><span style="color: #000000">unwrap</span><span style="color: #000000; font-weight: bold">();</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #000000; font-weight: bold">});</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #8f5902; font-style: italic">// core game loop</span>
+<span style="color: #204a87; font-weight: bold">loop</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #8f5902; font-style: italic">// submit work to worker threads</span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #204a87; font-weight: bold">for</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">chunk</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87; font-weight: bold">in</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">required_chunks</span><span style="color: #000000; font-weight: bold">()</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #000000">request_tx</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">send</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">chunk</span><span style="color: #000000; font-weight: bold">).</span><span style="color: #000000">unwrap</span><span style="color: #000000; font-weight: bold">();</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #8f5902; font-style: italic">// does not block</span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #8f5902; font-style: italic">// consume completed results, again without blocking</span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #204a87; font-weight: bold">while</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87; font-weight: bold">let</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87">Ok</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">res</span><span style="color: #000000; font-weight: bold">)</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">=</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">result_rx</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">try_recv</span><span style="color: #000000; font-weight: bold">()</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #8f5902; font-style: italic">// ... use result ...</span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #8f5902; font-style: italic">// ...</span>
+<span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline">   </span>
+</code></pre></div>
+
+
+<p>This works swimmingly until something causes a panic in the worker thread. Depending on the exact setup, one or more of the following could happen:</p>
+<ul>
+<li>✅ The panic causes the <a href="https://doc.rust-lang.org/std/sync/mpsc/struct.Receiver.html">receiving end</a> of the requests channel to disconnect, meaning <code>request_tx.send</code> now returns <code>Err</code> on the main thread<sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup>. Panic detected!</li>
+<li>✅ The panic causes the sending end of the results channel to disconnect, meaning <code>result_rx.try_recv</code> now returns <code>Err</code> on the main thread. Panic also detected!</li>
+<li>✅ Any mutex held by the worker thread is now <a href="https://doc.rust-lang.org/std/sync/struct.Mutex.html#poisoning">poisoned</a>, and attempts to lock it from any other thread will fail. Panic still detected!</li>
+<li>😧 The panic happens before any channel or mutex is in scope, so the thread dies and takes the request to its grave.</li>
+<li>😌 The thread pool notices a worker thread died and spawns a new one in its place.</li>
+<li>😩 The panic is unconditional (e.g. a <code>todo!()</code>) and we're now stuck in an infinite loop of thread killing and spawning.</li>
+<li>🤬 The IDE locks up from the strain of resolving so many stack traces.</li>
+</ul>
+<p>I've seen all of these happen, and any of the last 4 are a real pain to either notice or track down. The most amusing is #4; the main thread has requested a chunk of terrain and now waits forever for it, leaving a gaping hole in the world where that terrain should be<sup id="fnref:4"><a class="footnote-ref" href="#fn:4">4</a></sup>.</p>
+<p><span class="img_container" style="display: inline-block;"><img alt="Screenshot of single missing chunk" src="https://domwilliams0.github.io/images/panik-missing-chunk.png" style="display:block; margin-left: auto; margin-right: auto;" title="A panic killed the thread before it could finish processing that chunk, so I guess they'll just have to learn to live without it." /><span class="img_caption" style="display: block; text-align: center;">A panic killed the thread before it could finish processing that chunk, so I guess they'll just have to learn to live without it.</span></span></p>
+<p>I've written a small crate to avoid this happening again, which is the whole point of this post.</p>
+<p><span class="img_container" style="display: inline-block;"><img alt="panik-rs logo" src="https://raw.githubusercontent.com/DomWilliams0/panik-rs/master/panik.jpg" style="display:block; margin-left: auto; margin-right: auto;" title="I refuse to apologise for this." /><span class="img_caption" style="display: block; text-align: center;">I refuse to apologise for this.</span></span></p>
+<h2 id="panik-rs-to-the-rescue">panik-rs to the rescue</h2>
+<p><a href="https://crates.io/crates/panik">panik</a> is a simple wrapper around the standard panic functionality, and does the following:</p>
+<ul>
+<li>Wraps the application in <code>catch_unwind</code> to handle panics on the main thread</li>
+<li>Registers a custom panic hook to keep track of all panics</li>
+<li>Exposes functions to query all panics (<a href="https://docs.rs/panik/0.1.1/panik/fn.panics.html"><code>panik::panics</code></a>) and check if a panic has occurred on any thread (<a href="https://docs.rs/panik/0.1.1/panik/fn.has_panicked.html"><code>panik::has_panicked</code></a>)</li>
+</ul>
+<p>The <a href="https://docs.rs/panik/">docs</a> include some basic examples, but I want to show here how the API fits into the code base it was designed for.</p>
+<h3 id="example-in-context">Example in context</h3>
+<p>Below is a cut-down snippet from the game engine's <code>main</code>. The game spends its whole runtime inside the context of <code>panik::run_and_handle_panics</code>, which boils down to installing a custom panic hook and a <code>catch_unwind</code>, which catches any panics on the main thread and prevents them from bubbling up to kill the program too soon.</p>
+<div class="code" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #8f5902; font-style: italic">// ... initialize game state ....</span>
+
+<span style="color: #8f5902; font-style: italic">// run the game inside panik&#39;s handler</span>
+<span style="color: #204a87; font-weight: bold">let</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">result</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">=</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">panik</span>::<span style="color: #000000">run_and_handle_panics</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #ce5c00; font-weight: bold">||</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">do_main</span><span style="color: #000000; font-weight: bold">()</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">});</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #204a87; font-weight: bold">let</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">exit_code</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">=</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87; font-weight: bold">match</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">result</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #204a87">None</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">=&gt;</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #8f5902; font-style: italic">// 1 or more panics occurred which have already been</span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #8f5902; font-style: italic">// logged, nothing more to do</span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #0000cf; font-weight: bold">1</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #204a87">Some</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">_</span><span style="color: #000000; font-weight: bold">)</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">=&gt;</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #0000cf; font-weight: bold">0</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #8f5902; font-style: italic">// no panics occurred</span>
+<span style="color: #000000; font-weight: bold">};</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #8f5902; font-style: italic">// ... optionally use panik::panics() to programatically access</span>
+<span style="color: #8f5902; font-style: italic">//     panic messages, backtraces etc ...</span>
+
+<span style="color: #8f5902; font-style: italic">// ... attempt to save any game data ...</span>
+
+<span style="color: #000000">std</span>::<span style="color: #000000">process</span>::<span style="color: #000000">exit</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">exit_code</span><span style="color: #000000; font-weight: bold">);</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+</code></pre></div>
+
+
+<p>Now that panics will be detected by the custom panic handler, we need a way to interrupt the main thread if a panic occurred on different thread, in order to gracefully exit. This is done in two places:</p>
+<ul>
+<li>During startup, while waiting for the world to be loaded/generated by worker threads</li>
+<li>Every tick during gameplay</li>
+</ul>
+<p>The first was an early cause of annoyance; the game initially requests a radius of terrain around the player's position, then blocks with a timeout until the world is available. While the game is in an early state, there isn't much to do and world generation finishes quite quickly, but if something panics it will sit there and wait until the timeout has elapsed<sup id="fnref:5"><a class="footnote-ref" href="#fn:5">5</a></sup>. That code now looks like this:</p>
+<div class="code" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #204a87; font-weight: bold">pub</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87; font-weight: bold">fn</span> <span style="color: #000000">block_until_world_loaded</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #ce5c00; font-weight: bold">&amp;</span><span style="color: #204a87; font-weight: bold">mut</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #3465a4">self</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #000000">timeout</span>: <span style="color: #000000">Duration</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="background-color: #ffffcc"><span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #000000">bail</span>: <span style="color: #204a87; font-weight: bold">&amp;</span><span style="color: #000000">impl</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87">Fn</span><span style="color: #000000; font-weight: bold">()</span><span style="color: #f8f8f8; text-decoration: underline"> </span>-&gt; <span style="color: #204a87; font-weight: bold">bool</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+</span><span style="color: #000000; font-weight: bold">)</span><span style="color: #f8f8f8; text-decoration: underline"> </span>-&gt; <span style="color: #204a87">Result</span><span style="color: #ce5c00; font-weight: bold">&lt;</span><span style="color: #000000">SlabLocation</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">TerrainSourceError</span><span style="color: #ce5c00; font-weight: bold">&gt;</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #204a87; font-weight: bold">let</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">end_time</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">=</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">Instant</span>::<span style="color: #000000">now</span><span style="color: #000000; font-weight: bold">()</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">+</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">timeout</span><span style="color: #000000; font-weight: bold">;</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #204a87; font-weight: bold">loop</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="background-color: #ffffcc"><span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #204a87; font-weight: bold">if</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">bail</span><span style="color: #000000; font-weight: bold">()</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+</span><span style="background-color: #ffffcc"><span style="color: #f8f8f8; text-decoration: underline">            </span><span style="color: #204a87; font-weight: bold">break</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87">Err</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">TerrainSourceError</span>::<span style="color: #000000">Bailed</span><span style="color: #000000; font-weight: bold">);</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+</span><span style="background-color: #ffffcc"><span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+</span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #204a87; font-weight: bold">let</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">this_timeout</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">=</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">            </span><span style="color: #204a87; font-weight: bold">let</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">now</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">=</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">Instant</span>::<span style="color: #000000">now</span><span style="color: #000000; font-weight: bold">();</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">            </span><span style="color: #204a87; font-weight: bold">if</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">now</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">&gt;=</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">end_time</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">                </span><span style="color: #204a87; font-weight: bold">break</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87">Err</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">TerrainSourceError</span>::<span style="color: #000000">TimedOut</span><span style="color: #000000; font-weight: bold">);</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">            </span><span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">            </span><span style="color: #204a87; font-weight: bold">let</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">left</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">=</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">end_time</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">-</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">now</span><span style="color: #000000; font-weight: bold">;</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">            </span><span style="color: #000000">left</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">min</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">Duration</span>::<span style="color: #000000">from_secs</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #0000cf; font-weight: bold">1</span><span style="color: #000000; font-weight: bold">)).</span><span style="color: #000000">max</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">Duration</span>::<span style="color: #000000">from_secs</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #0000cf; font-weight: bold">3</span><span style="color: #000000; font-weight: bold">))</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #000000; font-weight: bold">};</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #8f5902; font-style: italic">// ... block for `this_timeout` and return `Ok(res)`</span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #8f5902; font-style: italic">//     if a result is returned ...</span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+</code></pre></div>
+
+
+<p>The lines of interest are highlighted - a function pointer is passed in which triggers an early exit if it returns true when called with no arguments. The limit on the timeout and the <code>loop</code> mean that <code>bail()</code> will be called periodically. As you've probably guessed, a function that fits that function signature is <code>panik::has_panicked</code>! </p>
+<p>The other place this is checked is every tick in the game loop. As soon as a panic is detected the loop is broken with an error:</p>
+<div class="code" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #8f5902; font-style: italic">// core game loop</span>
+<span style="color: #204a87; font-weight: bold">loop</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #204a87; font-weight: bold">if</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">panik</span>::<span style="color: #000000">has_panicked</span><span style="color: #000000; font-weight: bold">()</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">            </span><span style="color: #000000">debug</span><span style="color: #ce5c00; font-weight: bold">!</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #4e9a06">&quot;breaking out of loop due to panics&quot;</span><span style="color: #000000; font-weight: bold">);</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">            </span><span style="color: #204a87; font-weight: bold">break</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">Exit</span>::<span style="color: #000000">Stop</span><span style="color: #000000; font-weight: bold">;</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #8f5902; font-style: italic">// ... tick and render ...</span>
+<span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+</code></pre></div>
+
+
+<p>That's it! The API is pretty simple and easy enough to integrate into a code base. </p>
+<h3 id="before-after-comparison">Before/after comparison</h3>
+<p>This is what a panic in a worker thread during world initialisation looked like before. The panic and backtrace is mixed in with other logs, and the game window was unresponsive for 30 seconds before dying.</p>
+<div class="code" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #000000">...</span>
+<span style="color: #000000">  000000 DEBG populating chunk with slabs</span>
+<span style="background-color: #ffffcc"><span style="color: #000000">  00000thread &#39;0wrld-worker-0&#39; panicked at &#39;intentional panic!!11!&#39;, /home/.../name-needed/game/world/src/loader/finalizer.rs:84: 21</span>
+</span><span style="color: #000000">stack backtrace:</span>
+<span style="background-color: #ffffcc"><span style="color: #000000">DEBG removed 0 nodes in slab range, upper: SlabIndex(4), lower: SlabIndex(-1), removed: 0</span>
+</span><span style="background-color: #ffffcc"><span style="color: #000000">  000000 DEBG added 960 edges and 256 nodes, area: ChunkArea { slab: SlabIndex(1), area: SlabAreaIndex(1) }, nodes: 256, edges: 960</span>
+</span><span style="color: #000000">   0: std::panicking::begin_panic</span>
+<span style="color: #000000">   1: world::loader::finalizer::SlabFinalizer&lt;C&gt;::finalize::</span><span style="color: #8f5902; font-style: italic">{{</span><span style="color: #000000">closure</span><span style="color: #8f5902; font-style: italic">}}</span><span style="color: #000000"></span>
+<span style="color: #000000">   2: &lt;core::future::from_generator::GenFuture&lt;T&gt; as core::future::future::Future&gt;::poll</span>
+<span style="color: #000000">   ... lots of frames omitted ...</span>
+<span style="color: #000000">  45: tokio::runtime::blocking::pool::Spawner::spawn_thread::</span><span style="color: #8f5902; font-style: italic">{{</span><span style="color: #000000">closure</span><span style="color: #8f5902; font-style: italic">}}</span><span style="color: #000000"></span>
+<span style="color: #000000">note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.</span>
+<span style="color: #000000">... 30 seconds later ...</span>
+<span style="color: #000000">000000 CRIT critical error, error: Timed out</span>
+<span style="color: #000000">000000 CRIT more detail, error: TimedOut</span>
+<span style="color: #000000">000000 INFO waiting 2 seconds to allow other threads to finish logging, seconds: 2</span>
+<span style="color: #000000">000000 INFO exiting cleanly, code: 1</span>
+</code></pre></div>
+
+
+<p>But now, with the power of <code>panik</code>:</p>
+<div class="code" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #000000">  000000 DEBG populating chunk with slabs</span>
+<span style="color: #000000">000000 ERRO handling panic on thread ThreadId(9) (wrld-worker-3): &#39;intentional panic!!11!&#39;</span>
+<span style="background-color: #ffffcc"><span style="color: #000000">000000 WARN panic occurred in another thread, swallowing unpanicked result: Err(Error(Bailed))</span>
+</span><span style="background-color: #ffffcc"><span style="color: #000000">000000 ERRO 1 threads panicked, count: 1</span>
+</span><span style="color: #000000">000000 CRIT panic on thread &quot;ThreadId(9) (wrld-worker-3)&quot;: &quot;intentional panic!!11!&quot;</span>
+<span style="color: #000000">   0: panik::register_panic</span>
+<span style="color: #000000">   1: panik::GlobalStateGuard::init::</span><span style="color: #8f5902; font-style: italic">{{</span><span style="color: #000000">closure</span><span style="color: #8f5902; font-style: italic">}}</span><span style="color: #000000"></span>
+<span style="color: #000000">   ... lots of frames omitted ...</span>
+<span style="color: #000000">  62: __GI___clone</span>
+<span style="color: #000000">000000 INFO waiting 2 seconds to allow other threads to finish logging, seconds: 2</span>
+<span style="color: #000000">000000 INFO exiting cleanly, code: 1</span>
+</code></pre></div>
+
+
+<p>The logs are clear and not intermingled, and the game exited immediately. Much better!</p>
+<h2 id="watch-out-for-async-runtimes">Watch out for async runtimes</h2>
+<p>Since moving my manual thread pools to <a href="https://crates.io/crates/tokio">tokio</a>, panics have become more of a pain, especially unconditional panics when I forget to remove a <code>todo!()</code>. The runtime's behaviour of auto-spawning new threads to replace the dead ones doesn't lead to pretty results, and I'm sure the following log speaks for itself:</p>
+<div class="code" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #000000">...</span>
+<span style="color: #000000">000000 ERRO handling panic on thread ThreadId(7) (wrld-worker-1): &#39;unconditional panic!!11!&#39;</span>
+<span style="color: #000000">000000 ERRO handling panic on thread ThreadId(9) (wrld-worker-3): &#39;unconditional panic!!11!&#39;</span>
+<span style="color: #000000">000000 ERRO handling panic on thread ThreadId(11) (wrld-worker-5): &#39;unconditional panic!!11!&#39;</span>
+<span style="color: #000000">000000 ERRO handling panic on thread ThreadId(10) (wrld-worker-4): &#39;unconditional panic!!11!&#39;</span>
+<span style="color: #000000">000000 ERRO handling panic on thread ThreadId(6) (wrld-worker-0): &#39;unconditional panic!!11!&#39;</span>
+<span style="color: #000000">000000 ERRO handling panic on thread ThreadId(8) (wrld-worker-2): &#39;unconditional panic!!11!&#39;</span>
+<span style="color: #000000">000000 ERRO handling panic on thread ThreadId(9) (wrld-worker-3): &#39;unconditional panic!!11!&#39;</span>
+<span style="color: #000000">000000 ERRO handling panic on thread ThreadId(11) (wrld-worker-5): &#39;unconditional panic!!11!&#39;</span>
+<span style="color: #000000">000000 ERRO handling panic on thread ThreadId(10) (wrld-worker-4): &#39;unconditional panic!!11!&#39;</span>
+<span style="color: #000000">000000 ERRO handling panic on thread ThreadId(6) (wrld-worker-0): &#39;unconditional panic!!11!&#39;</span>
+<span style="color: #000000">000000 ERRO handling panic on thread ThreadId(8) (wrld-worker-2): &#39;unconditional panic!!11!&#39;</span>
+<span style="color: #000000">000000 ERRO handling panic on thread ThreadId(6) (wrld-worker-0): &#39;unconditional panic!!11!&#39;</span>
+<span style="color: #000000">000000 ERRO handling panic on thread ThreadId(11) (wrld-worker-5): &#39;unconditional panic!!11!&#39;</span>
+<span style="color: #000000">000000 ERRO handling panic on thread ThreadId(10) (wrld-worker-4): &#39;unconditional panic!!11!&#39;</span>
+<span style="color: #000000">... many many more ...</span>
+<span style="color: #000000">000000 ERRO handling panic on thread ThreadId(7) (wrld-worker-1): &#39;unconditional panic!!11!&#39;</span>
+<span style="color: #000000">000000 WARN panic occurred in another thread, swallowing unpanicked result: Err(Error(Bailed))</span>
+<span style="color: #000000">000000 ERRO 402 threads panicked, count: 402</span>
+<span style="color: #000000">000000 CRIT panic on thread &quot;ThreadId(7) (wrld-worker-1)&quot;: &quot;unconditional panic!!11!&quot;</span>
+<span style="color: #000000">   0: panik::register_panic</span>
+<span style="color: #000000">   1: panik::GlobalStateGuard::init::</span><span style="color: #8f5902; font-style: italic">{{</span><span style="color: #000000">closure</span><span style="color: #8f5902; font-style: italic">}}</span><span style="color: #000000"></span>
+<span style="color: #000000">   ... lots of frames omitted ...</span>
+<span style="color: #000000">  61: start_thread</span>
+<span style="color: #000000">  62: __GI___clone</span>
+
+<span style="color: #000000">000000 CRIT panic on thread &quot;ThreadId(9) (wrld-worker-3)&quot;: &quot;unconditional panic!!11!&quot;</span>
+<span style="color: #000000">   0: panik::register_panic</span>
+<span style="color: #000000">   ... repeat for every single panic ...</span>
+</code></pre></div>
+
+
+<p>This is the reason for <a href="https://docs.rs/panik/0.1.1/panik/struct.Builder.html#method.backtrace_resolution_limit">enforcing a limit</a> on the number of backtraces to resolve, defaulting to 8. If there are 8+ panics occurring, the first 8 should give you enough information to fix the rest.</p>
+<h2 id="summary">Summary</h2>
+<p>Hopefully this crate can help others react to panics properly in their fearlessly concurrent programs! I've linked to it a few times above, but <a href="https://crates.io/crates/panik">here it is again in case you missed it</a>.</p>
+<p><span class="img_container" style="display: inline-block;"><img alt="Kalm meme, sorry" src="https://domwilliams0.github.io/images/panik-kalm.jpg" style="display:block; margin-left: auto; margin-right: auto;" title="Ok, I apologise for this one." /><span class="img_caption" style="display: block; text-align: center;">Ok, I apologise for this one.</span></span></p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>Unless it's the main thread or you're using <code>panic = "abort"</code>, then you lose the whole process too.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>By "silent" I mean breaking the game but not enough to crash it, leaving it running in a broken state. The panic backtrace will probably be visible in the logs, but sometimes interleaved with other logs if it's written directly to <code>stderr</code> while they're buffered and written to by a separate thread. And by "sometimes" I mean every time.&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:3">
+<p>Assuming of course you check the return value of <a href="https://doc.rust-lang.org/std/sync/mpsc/struct.Sender.html#method.send">send</a> and don't swallow it with <code>let _ = request_tx.send(..)</code>.&#160;<a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:4">
+<p>Ok, I'll fess up - it's not normally as surgical as shown in the image. I intentionally added an unconditional panic when loading that chunk in particular, just for the screenshot. But the point still stands!&#160;<a class="footnote-backref" href="#fnref:4" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:5">
+<p>This timeout was only 30 seconds, but when running and rerunning the game constantly during dev those lost seconds really add up; sometimes <strong>minutes per day</strong> are lost to waiting on a "peculiarly long load time".&#160;<a class="footnote-backref" href="#fnref:5" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+    </article>
+</main>
+
+<footer>
+    <div class="prev-next">
+    <span><a href="/devlog4">← Devlog #4: entity activities</a></span>
+    <span>&nbsp;</span>
+</div>
+
+    <hr/>
+</footer>
+</body>
+</html>
+
