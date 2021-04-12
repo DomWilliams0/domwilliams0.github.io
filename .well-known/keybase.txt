@@ -1,0 +1,86 @@
+==================================================================
+https://keybase.io/domwilliams0
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of https://domwillia.ms
+  * I am domwilliams0 (https://keybase.io/domwilliams0) on keybase.
+  * I have a public key with fingerprint 36B5 EB10 9835 6E7B A795  8AC1 1E6D A1A8 6369 CBC8
+
+To do so, I am signing this object:
+
+{
+  "body": {
+    "key": {
+      "eldest_kid": "010177a5b6b85a1e8f4fc6f2af98b7b2db1f38947d4ec8976715f3c54ec01064cc1a0a",
+      "fingerprint": "36b5eb1098356e7ba7958ac11e6da1a86369cbc8",
+      "host": "keybase.io",
+      "key_id": "1e6da1a86369cbc8",
+      "kid": "010177a5b6b85a1e8f4fc6f2af98b7b2db1f38947d4ec8976715f3c54ec01064cc1a0a",
+      "uid": "5c54c64b7958837dd16d887c1398d519",
+      "username": "domwilliams0"
+    },
+    "merkle_root": {
+      "ctime": 1618212620,
+      "hash_meta": "4d51b31594ffde0662dfc50b1d60b3892b117dabec54ba6b8e670c714e427d3e",
+      "seqno": 19606519
+    },
+    "revoke": {
+      "sig_ids": [
+        "0797088d2c4dfdd74bb729d8582c472cf40ea32eafebd434422e12b9cfe943990f"
+      ]
+    },
+    "service": {
+      "hostname": "domwillia.ms",
+      "protocol": "https:"
+    },
+    "type": "web_service_binding",
+    "version": 1
+  },
+  "ctime": 1618212623,
+  "expire_in": 157680000,
+  "prev": "db6603f6c372556ae7bf4fcc35703c380459f51bb7d0e87b8e089150c626d5ce",
+  "seqno": 16,
+  "tag": "signature"
+}
+
+which yields the signature:
+
+-----BEGIN PGP MESSAGE-----
+
+owGtU2tMFUcUBsEWfBW0PlBQWNP6QtjZx8zu1VDToqHW+IjR4quXnZ1Z3N7H4u4F
+vEWqbUWkUWtifWArilVUlCYSH1SbijYYW7Wo1WhsSBQf1aKgNRWtRTtLatKY/uz8
+mcyZ73znO9+cWd0zKiIm8snS0ZnH+w1cGXnyNo7IcdpTijhskTDnKeJ8tHOjfkKd
+kNdnEs7D8YAHCGkyhliRNUAVQzJ0aAiaoSoYYYFgYIiKKiEiUV1REURANkRdZieW
+CiVdBxqvcamcYQZzqZ1nm8EQoxUhlikGvKqIMqQIa0iVFU0HgEKiAU2BIlR1rCss
+cb7luBlMHNYcmmZaLMYO3k55/4H/n3Xnd9LJ7EaHEnZlKiIiBECiKEgHoqoQGagu
+0KF2UAtQhiZWoND0+00t4PBccSoXoLbPT722ZYVcg/WQ6cIABIoABCjwrEnNme8N
+0JDGsiVGiEUgq5JhEMpDKBBDl3kMCOQx0yxgABDRMGWasMb6oxDxOgISlQRERMq0
+OHRB0GIVVMhDpo5JsGmB5aNudcfMZd45nGdO/SKORyriFYUIukQMQpCEMRJUosgK
+iyBBNySeaqJANYNiIomSJAgUCFjVDapKoqryBjev2K1nF5h6J737XC/akBZwmKg8
+2wpZuuVnN/NDoTzH41oTCue50EKKvf+QeLEZJGxYWEYBtR3TCrJGGPJF18RUji7M
+M23qNV2EjKDCs+XWoQVudQwhLxpQF5Egy1BjU+bOgC7KiBd1UeElWTWY0xgRniqI
+2cgrKpB5HQqQyPq/bYRMp5bLOJl3QS2Ub1OuuFtZFzE6IjImIqlfSnRUeGTmiN2j
+V9RWPtn0/IN17eL+rohusXHPI6+cjovYs6/3uCOkduP9/bN+jsLvXeuVNPPU1oTJ
+CxqjctrWHbNmPD6TLObnLL76cVTVyH0ZTdqDS54BB6PX93hzb/pC7W7Sd+1rXtu9
+dtTFGSMuHU5My55c9OeujbuGdDwKZryUMefOturdeNSFE6un1/U/d6VkWnpNW49J
+jfqGjk1HNlTsfDh81Z0P7+Wti2sfPgAMXb/g/BhUU3p+1pQvpj5elvi09VTMunD6
+43i+e6Ud7nWivls0bb5Y/u2Uin0177QEDpetiS041LfBj8Ybqe9fsb9JOHfvoHz2
+gC+8Jds/cfTyhOnxvrc/utVSl5zwRpY1jHb/anbh8p3lKxO7rm3ZubS0rPuvRYuf
+NcHVfba8Oiqq4nJVnH//5wquqy9+VvRWDTducXxD1dz9Bw7umhgeltRUefEH75cd
+j27O3V59Krv12I8TdlS3nc05vgKczCy5O2LJrUE/DR77wdS59SW9U+87oXjzRmX2
+eHAiuu7CkHn1YzfX9+r78ELiocjW3DM3k1cObWn4/bec0qP9Bh3PTG96t/Q2av+j
+ubr107ZCz+zWr/3bmvdc7XlzwOBbtWMGttxIGbTqUPPJadfWx5THrs3ZcvR6w9MZ
+E4o/SZpZnpVR0ZzRZ5F/2ekNVa33r352ZnNbSUlp7fUHVzqyzKkPv5euk9eferZu
+f3lv1vIlacMsWbrcf1uZ76+zqcvy437ZNGvHWDzJm7w3tnHh3w==
+=g1Gi
+-----END PGP MESSAGE-----
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/domwilliams0
+
+==================================================================
+
