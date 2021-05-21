@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Devlog #5: voxel world goals</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="An introduction to and high-level specification of the 3D voxel game world."/>
+    <meta name="author" content="Dom Williams">
+    <!--<meta name="keywords" content="rust, gamedev, devlog, name-needed, game-engine, voxel, world, procedural, generation"/>-->
+    <style type="text/css">:root{font-family:"Helvetica Neue",system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:#333;background-color:#fefefe;text-rendering:optimizeLegibility;font-size:16pt}body{max-width:38rem;padding:1rem;margin:auto}video{max-width:35rem;margin:auto;display:block}pre{padding:20px;border-radius:8px;overflow:auto}code{overflow:scroll;overflow-y:auto;overflow-x:auto;font-family:Consolas,Monaco,Andale Mono,Ubuntu Mono,monospace;-webkit-font-feature-settings:normal;-moz-font-feature-settings:normal;font-feature-settings:normal;padding:3px;margin:3px;border-radius:4px;font-weight:400;background:#ececee}pre code{background:none !important;color:#ccc}article{line-height:1.6rem;display:block}blockquote{border-left:2px solid;margin:40px 15px;padding:10px;font-style:italic}@media(max-width:683px){blockquote{margin:10px;padding:10px}}blockquote:before{content:"”";font-family:Georgia,serif;font-size:3.875rem;position:absolute;left:-40px;top:-20px}blockquote p:first-of-type{margin-top:0}blockquote p:last-of-type{margin-bottom:0}.article-date{color:#777;margin-bottom:20px}main header{margin:0}main header h1{margin-bottom:0}.article-title{font-size:2rem}.prev-next{width:100%}.next{float:right}nav#toc ul{list-style-type:disc;padding-left:10px;margin-left:10px}#toc{float:right;margin:0 1.5rem;background-color:#fafafa;padding:.5rem .5rem;border-radius:4px;line-height:1.5rem}#toc a,#toc a:visited{color:#0679a7}@media(max-width:500px){#toc{float:none;margin:auto;width:70%}.header-nav{display:block !important;float:none !important;text-align:center}:root{font-size:12pt}}#blog-header{border-bottom:2px solid #333;margin:0 auto 5px;display:block;overflow:hidden}#blog-header h1{font-size:1.6rem}#blog-header nav{float:right}.link5eva a:visited,.link5eva a{color:var(--color)}#blog-header a{text-decoration:none;display:inline-block}#blog-header a:hover{color:#414141}.header-nav{display:inline;margin:auto;padding:.5rem 0}.icons svg{width:1rem;height:auto;padding:0 10px;color:#111}.footnote,.footnote p{font-size:.9em;font-style:italic;line-height:1.4}.footnote{font-style:normal}.footnote-ref{padding:0 .2rem}.img_container{height:auto;display:block !important}.img_container img{display:inline-block;max-width:90%}.img_caption{text-align:left;font-size:.9em;font-style:italic}.hidden{display:none}#intro p,#intro li{font-size:.9rem}footer p{margin-top:0;font-size:.8rem;text-align:center;color:#5e5e5e}</style>
+</head>
+
+<body>
+<header id="blog-header">
+    <div class="link5eva">
+        <h1 class="notalink header-nav"><a href="/" title="Return to root">Dom Williams</a></h1>
+        <nav class="icons header-nav">
+            <a href="/index.xml" title="RSS feed">
+                <span class="hidden">RSS</span>
+                <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>RSS</title>
+                    <path d="M19.199 24C19.199 13.467 10.533 4.8 0 4.8V0c13.165 0 24 10.835 24 24h-4.801zM3.291 17.415c1.814 0 3.293 1.479 3.293 3.295 0 1.813-1.485 3.29-3.301 3.29C1.47 24 0 22.526 0 20.71s1.475-3.294 3.291-3.295zM15.909 24h-4.665c0-6.169-5.075-11.245-11.244-11.245V8.09c8.727 0 15.909 7.184 15.909 15.91z"/>
+                </svg>
+            </a>
+            <a href="https://github.com/DomWilliams0" title="GitHub">
+                <span class="hidden">GitHub</span>
+                <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>GitHub</title>
+                    <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+                </svg>
+            </a>
+            <a href="mailto:contact@domwillia.ms" title="Contact Me">
+                <span class="hidden">Email</span>
+                <!-- icon from Font Awesome: https://fontawesome.com/license-->
+                <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="envelope"
+                     class="svg-inline--fa fa-envelope fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg"
+                     viewBox="0 0 512 512">
+                    <path fill="currentColor"
+                          d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+                </svg>
+
+            </a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <header>
+        <h1 class="article-title">Devlog #5: voxel world goals</h1>
+        <div class="article-date">
+            <time datetime="2021-05-21">21 May 2021</time>
+        </div>
+    </header>
+
+    <article>
+        <nav id="toc" class="link5eva">
+            <strong>Table of Contents</strong>
+            <div class="toc">
+<ul>
+<li><a href="#world-goals">World goals</a><ul>
+<li><a href="#high-voxel-granularity">High voxel granularity</a></li>
+<li><a href="#finite-planet-surface">Finite planet surface</a></li>
+<li><a href="#infinite-depth">Infinite depth</a></li>
+</ul>
+</li>
+<li><a href="#future-posts">Future posts</a></li>
+</ul>
+</div>
+
+        </nav>
+
+        <p>This is the first in a mini series about the 3D voxel-based game world. I skimmed over the concept in <a href="/devlog0/">the first devlog</a>, and the idea of this series is to cover interesting technical details and design decisions.</p>
+<p>Note that these posts only document the design at the time of writing; I foresee plenty of churn and restructuring in the future, but that doesn't necessarily invalidate the previous designs as incorrect, just that my requirements changed.</p>
+<h2 id="world-goals">World goals</h2>
+<p>First of all, I want to describe my high-level aspirations for the game world. As above, it is <strong>3D</strong> and <strong>voxel-based</strong>.</p>
+<p>The 3rd dimension brings a great deal of technical challenges and extra gameplay considerations, which I feel definitely belong in this simulation-targeted game. RimWorld has gotten away quite successfully with only 2 dimensions and simpler game mechanics than Dwarf Fortress, but as mentioned in the <a href="/devlog0/">vision and goals</a> post, I want to strive for ridiculous depths of simulation rather than commercial success.</p>
+<p>Blocky voxel mechanics fit this genre of game with destructible terrain very well, and can be visually pleasing as <a href="https://web.archive.org/web/20200905120553if_/https://cdn.cloudflare.steamstatic.com/steam/apps/294100/ss_44a8828a81f12d2c4103c42df902e804d851a380.1920x1080.jpg?t=1594308831">RimWorld</a> has shown, so this is the obvious choice for me. <a href="https://web.archive.org/web/20210521151651if_/https://i.redd.it/z0euzcdoezu21.jpg">Space Engineers</a> employs smoother, polygon-based voxels that work well with a 3D camera, but I don't think this would work well from a top-down-only perspective.</p>
+<p>In the current implementation, the up and down arrow keys move the camera up and down in the game world by a single, discrete slice of blocks (or Z-level for DF fans), as can be seen below.</p>
+<p><span class="img_container" style="display: inline-block;"><img alt="Top-down camera perspective" src="https://domwilliams0.github.io/images/devlog5-slices.gif" style="display:block; margin-left: auto; margin-right: auto;" title="Pressing the up arrow a few times to move the top-down perspective vertically upwards. The block colour represents how the camera range intersects with the world (under the surface, intersecting a tree trunk, floating above the ground). Yes those are &quot;trees&quot;, yes they do look like green Minecraft mushrooms, yes there are some people stuck on the treetops due to a current physics bug." /><span class="img_caption" style="display: block; text-align: center;">Pressing the up arrow a few times to move the top-down perspective vertically upwards. The block colour represents how the camera range intersects with the world (under the surface, intersecting a tree trunk, floating above the ground). Yes those are &quot;trees&quot;, yes they do look like green Minecraft mushrooms, yes there are some people stuck on the treetops due to a current physics bug.</span></span></p>
+<h3 id="high-voxel-granularity">High voxel granularity</h3>
+<p>The scale of voxels to entities is still undecided, but I'm thinking 1 block will be around 1 foot/30cm. On a scale between Terraria (tiny blocks) and Minecraft (huge cubic metres), it will definitely be closer to the Terraria end.</p>
+<p>This will allow for a reasonable level of detail in world mechanics - building insulation and aesthetics, for example. Instead of building walls out of a single layer of wood or stone blocks, I want it to be possible to build up layers of e.g. bricks on the outside, insulation within the wall, and a fancier material on the inside.</p>
+<h3 id="finite-planet-surface">Finite planet surface</h3>
+<p>The game world is limited to a distinct/unique procedurally generated planet, where the explorable space is enormous but not infinite. Circumnavigating the planet should be an ambitious but attainable task, and players with the nerve (and time) will eventually find themselves back where they started<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>.</p>
+<p>Because of this constraint, there can be many passes during initial generation to produce interesting global features that would be a lot harder in an infinitely expanding Minecraft-esque world, such as:</p>
+<ul>
+<li>Latitude affecting the environment, i.e. colder near the poles, warmer near the equator</li>
+<li>Distinct continents and oceans</li>
+<li>Realistic mountain ranges/rivers flowing towards oceans (to some degree<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>)</li>
+</ul>
+<h3 id="infinite-depth">Infinite depth</h3>
+<p>In contrast to the limited planet surface, there should be no (unreasonable) limit in the vertical axis. Mountains should pierce the heavens, oceans should plunge to bone-squishing depths, and mining should eventually lead to the planet's core (or until it's too hot for anything to survive).</p>
+<h2 id="future-posts">Future posts</h2>
+<p>Realising this ambitious goal of generating and simulating a massive game world is assuredly not a simple task, which is the main motivation for this devlog series. Posts in the future will cover:</p>
+<ul>
+<li>3D voxel grid data structures for optimal cache coherence</li>
+<li>Procedural planet generation<ul>
+<li>Continent placement</li>
+<li>Biome allocation</li>
+<li>Global feature placement (e.g. mountain ranges)</li>
+<li>Regional and local feature placement (e.g. trees in forests)</li>
+</ul>
+</li>
+<li>Ridiculous (but fearless™️) concurrency for terrain generation/loading/modifying</li>
+</ul>
+<p>The last 6 months (since Nov 2020) have been slow for writing while I've been busy <a href="https://github.com/DomWilliams0/name-needed/blob/3d39206f8650c7d6efc2d72294f791bf2c47c1d2/README.md">implementing half of the above</a>, which I can finally start documenting. Stay tuned for a slew of deep technical dives!</p>
+<p><span class="img_container" style="display: inline-block;"><img alt="World map showing continents and basic biome allocations" src="https://domwilliams0.github.io/images/devlog5-planet.png" style="display:block; margin-left: auto; margin-right: auto;" title="Planet generation at the time of writing. Biomes are selected based on elevation, moisture and temperature, which is dependent on latitude and elevation. You've probably noticed that the continents don't currently wrap around the edges, making it very unplanetlike for now." /><span class="img_caption" style="display: block; text-align: center;">Planet generation at the time of writing. Biomes are selected based on elevation, moisture and temperature, which is dependent on latitude and elevation. You've probably noticed that the continents don't currently wrap around the edges, making it very unplanetlike for now.</span></span></p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>I'm absolutely going to avoid <a href="https://gamedev.stackexchange.com/a/164689">the pain of true spherical planets</a>, which don't work well with grid-based voxel worlds. Instead the planet will behave more like a <a href="https://www.redblobgames.com/x/1640-hexagon-tiling-of-sphere/wraparound.jpg">torus</a>.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>There's infinite scope for realism here, which could include accurate weather (moisture, cloud formation, precipitation), erosion, volcanoes, etc. Maybe even to the depths of Dwarf Fortress by simulating the rise and fall of civilisations over centuries.&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+    </article>
+</main>
+
+<footer>
+    <div class="prev-next">
+    <span><a href="/panik">← Application-wide panic handling</a></span>
+    <span>&nbsp;</span>
+</div>
+
+    <hr/> <br/>
+    <p>Return to <a href="/">home</a> | Subscribe to <a href="/index.xml">RSS</a> | Send me an <a href="mailto:contact@domwillia.ms">email</a> | Follow me on <a href="https://github.com/DomWilliams0">GitHub</a></p>
+</footer>
+</body>
+</html>
+
