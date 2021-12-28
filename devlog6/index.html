@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Devlog #6: async activities</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="An overview of many months of churning the entity activity system to use Rust's async/await support, for a much nicer design."/>
+    <meta name="author" content="Dom Williams">
+    <!--<meta name="keywords" content="rust, gamedev, devlog, name-needed, game-engine, async, await, activity, ai, behavior"/>-->
+    <style type="text/css">:root{font-family:"Helvetica Neue",system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:#333;background-color:#fefefe;text-rendering:optimizeLegibility;font-size:16pt}body{max-width:38rem;padding:1rem;margin:auto}video{max-width:35rem;margin:auto;display:block}pre{padding:20px;border-radius:8px;overflow:auto}code{overflow:scroll;overflow-y:auto;overflow-x:auto;font-family:Consolas,Monaco,Andale Mono,Ubuntu Mono,monospace;-webkit-font-feature-settings:normal;-moz-font-feature-settings:normal;font-feature-settings:normal;padding:3px;margin:3px;border-radius:4px;font-weight:400;background:#ececee}pre code{background:none !important;color:#ccc}article{line-height:1.6rem;display:block}blockquote{border-left:2px solid;margin:40px 15px;padding:10px;font-style:italic}@media(max-width:683px){blockquote{margin:10px;padding:10px}}blockquote:before{content:"”";font-family:Georgia,serif;font-size:3.875rem;position:absolute;left:-40px;top:-20px}blockquote p:first-of-type{margin-top:0}blockquote p:last-of-type{margin-bottom:0}.article-date{color:#777;margin-bottom:20px}main header{margin:0}main header h1{margin-bottom:0}.article-title{font-size:2rem}.prev-next{width:100%}.next{float:right}nav#toc ul{list-style-type:disc;padding-left:10px;margin-left:10px}#toc{float:right;margin:0 1.5rem;background-color:#fafafa;padding:.5rem .5rem;border-radius:4px;line-height:1.5rem}#toc a,#toc a:visited{color:#0679a7}@media(max-width:500px){#toc{float:none;margin:auto;width:70%}.header-nav{display:block !important;float:none !important;text-align:center}:root{font-size:12pt}}#blog-header{border-bottom:2px solid #333;margin:0 auto 5px;display:block;overflow:hidden}#blog-header h1{font-size:1.6rem}#blog-header nav{float:right}.link5eva a:visited,.link5eva a{color:var(--color)}#blog-header a{text-decoration:none;display:inline-block}#blog-header a:hover{color:#414141}.header-nav{display:inline;margin:auto;padding:.5rem 0}.icons svg{width:1rem;height:auto;padding:0 10px;color:#111}.footnote,.footnote p{font-size:.9em;font-style:italic;line-height:1.4}.footnote{font-style:normal}.footnote-ref{padding:0 .2rem}.img_container{height:auto;display:block !important}.img_container img{display:inline-block;max-width:90%}.img_caption{text-align:left;font-size:.9em;font-style:italic}.hidden{display:none}#intro p,#intro li{font-size:.9rem}footer p{margin-top:0;font-size:.8rem;text-align:center;color:#5e5e5e}aside:before{content:"Sidenote: ";font-weight:bold}aside{background-color:#d3e9f5;border:1px double #bde6fc;border-radius:10px;padding:.5rem .5rem;font-size:.9rem}</style>
+</head>
+
+<body>
+<header id="blog-header">
+    <div class="link5eva">
+        <h1 class="notalink header-nav"><a href="/" title="Return to root">Dom Williams</a></h1>
+        <nav class="icons header-nav">
+            <a href="/index.xml" title="RSS feed">
+                <span class="hidden">RSS</span>
+                <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>RSS</title>
+                    <path d="M19.199 24C19.199 13.467 10.533 4.8 0 4.8V0c13.165 0 24 10.835 24 24h-4.801zM3.291 17.415c1.814 0 3.293 1.479 3.293 3.295 0 1.813-1.485 3.29-3.301 3.29C1.47 24 0 22.526 0 20.71s1.475-3.294 3.291-3.295zM15.909 24h-4.665c0-6.169-5.075-11.245-11.244-11.245V8.09c8.727 0 15.909 7.184 15.909 15.91z"/>
+                </svg>
+            </a>
+            <a href="https://github.com/DomWilliams0" title="GitHub">
+                <span class="hidden">GitHub</span>
+                <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>GitHub</title>
+                    <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+                </svg>
+            </a>
+            <a href="mailto:contact@domwillia.ms" title="Contact Me">
+                <span class="hidden">Email</span>
+                <!-- icon from Font Awesome: https://fontawesome.com/license-->
+                <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="envelope"
+                     class="svg-inline--fa fa-envelope fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg"
+                     viewBox="0 0 512 512">
+                    <path fill="currentColor"
+                          d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+                </svg>
+
+            </a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <header>
+        <h1 class="article-title">Devlog #6: async activities</h1>
+        <div class="article-date">
+            <time datetime="2021-12-28">28 Dec 2021</time>
+        </div>
+    </header>
+
+    <article>
+        <nav id="toc" class="link5eva">
+            <strong>Table of Contents</strong>
+            <div class="toc">
+<ul>
+<li><a href="#past-mistakes">Past mistakes</a><ul>
+<li><a href="#fragile-state-machine-boilerplate">Fragile state machine boilerplate</a></li>
+<li><a href="#one-event-handler-for-all-states">One event handler for all states</a></li>
+<li><a href="#no-event-handling-in-subactivities">No event handling in subactivities</a></li>
+<li><a href="#manual-interruption-handling">Manual interruption handling</a></li>
+</ul>
+</li>
+<li><a href="#the-way-of-async">The way of async</a><ul>
+<li><a href="#linear-control-flow">Linear control flow</a></li>
+<li><a href="#self-contained-subactivities">Self-contained subactivities</a></li>
+<li><a href="#interruptions-via-raii">Interruptions via RAII</a></li>
+<li><a href="#activity-status">Activity status</a></li>
+</ul>
+</li>
+<li><a href="#was-the-churn-worth-it">Was the churn worth it?</a></li>
+</ul>
+</div>
+
+        </nav>
+
+        <p><a href="/devlog4">A previous devlog</a> outlined the system that controls a living entity's behaviour.
+While the concept is still sound, the implementation became a total mess as more activity types
+were added.</p>
+<p>Since then I have refactored it all to use Rust's excellent <code>async/await</code> support. This post will
+cover the ergonomic API this gives us, and a future one will go into the guts of the implementation.</p>
+<h2 id="past-mistakes">Past mistakes</h2>
+<p>Before getting to the juicy new design, I'll first go over what exactly made the old implementation
+unbearable to work with. You can <a href="#impatience">skip to the next section</a> if you don't want to dwell
+on bad design decisions.</p>
+<p>So, what was wrong with the <a href="/devlog4">old implementation</a>? I think enough to justify a multi-month
+rewrite:</p>
+<h3 id="fragile-state-machine-boilerplate">Fragile state machine boilerplate</h3>
+<p>Every activity had to manually implement a state machine to handle its own control flow. Despite a
+simple and linear flow of events (such as "go to this position, pick up the item, carry it here, drop it"),
+control flow would continually jump between <code>on_tick</code> and <code>on_event</code>, with a lot of boilerplate
+getting in the way.</p>
+<p>Here's a small pseudocode<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> example to show what a headache this quickly became:</p>
+<ul>
+<li>The initial state is <code>NotYetStarted</code>, and the activity is unblocked, so <code>on_tick</code> is called.</li>
+<li>Navigation to the destination is requested, and the state is now <code>GoingToTheThing</code>. We subscribe
+    to the arrival event, and block the activity, so <code>on_tick</code> will not be called again.</li>
+<li><code>on_event</code> is eventually called with the arrival event, which updates the state to <code>DoingTheThing</code> and
+    unblocks the activity, scheduling <code>on_tick</code> again.</li>
+<li><code>on_tick</code> is called again, which kicks off whatever the "thing" is for this activity (e.g.
+    breaking a block, or picking up an item).</li>
+</ul>
+<div class="code" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #204a87; font-weight: bold">enum</span> <span style="color: #000000">State</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #000000">NotYetStarted</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #000000">GoingToTheThing</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #000000">DoingTheThing</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #000000">FinishingTheThing</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #ce5c00; font-weight: bold">..</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #204a87; font-weight: bold">fn</span> <span style="color: #000000">on_tick</span><span style="color: #000000; font-weight: bold">()</span>:
+    <span style="color: #000000">match</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #3465a4">self</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">state</span>:
+        <span style="color: #000000">NotYetStarted</span>:
+            <span style="color: #000000">request_navigation</span><span style="color: #000000; font-weight: bold">()</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">            </span><span style="color: #3465a4">self</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">state</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">=</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">GoingToTheThing</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">            </span><span style="color: #000000">subscribe_to_arrival_event</span><span style="color: #000000; font-weight: bold">()</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">            </span><span style="color: #000000">block_activity_until_event</span><span style="color: #000000; font-weight: bold">()</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #000000">DoingTheThing</span>:
+            <span style="color: #000000">start_doing_the_thing</span><span style="color: #000000; font-weight: bold">()</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">            </span><span style="color: #000000">subscribe_to_completion_event</span><span style="color: #000000; font-weight: bold">()</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">            </span><span style="color: #ce5c00; font-weight: bold">..</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #ce5c00; font-weight: bold">..</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #204a87; font-weight: bold">fn</span> <span style="color: #000000">on_event</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">evt</span><span style="color: #000000; font-weight: bold">)</span>:
+    <span style="color: #000000">if</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">evt</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">is</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">Arrival</span>:
+        <span style="color: #000000">self</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">state</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">=</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">DoingTheThing</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #000000">unblock_activity</span><span style="color: #000000; font-weight: bold">()</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+</code></pre></div>
+
+
+<h3 id="one-event-handler-for-all-states">One event handler for all states</h3>
+<p>As activities progress through different states, they will be subscribed to different events -
+the <code>Arrived</code> event during navigation, the <code>PickedUp</code> event when hauling an item, etc. This quickly 
+causes the single per-activity event handler to balloon in complexity, as it has to cope with
+all combinations of event types with current state.</p>
+<p>There's no need for a pseudocode example of this, just marvel at the gross complexity in the <a href="https://github.com/DomWilliams0/name-needed/blob/2431395fc022a500bcfd19c5c97bde7d4bc9e53a/game/simulation/src/activity/activities/go_haul.rs#L265">haul
+activity event
+handler</a>.</p>
+<h3 id="no-event-handling-in-subactivities">No event handling in subactivities</h3>
+<p>Subactivities were meant to enable easy sharing of common behaviour, like navigation. In practice
+this didn't provide as much convenience as expected, due to the flawed event handler design.</p>
+<p>Subactivities could subscribe to events but didn't have their own handler callback. This meant the
+calling activities had to know about their exact implementation details so they could handle the
+expected events... if this isn't the definition of "leaky abstraction" I don't know what is.</p>
+<h3 id="manual-interruption-handling">Manual interruption handling</h3>
+<p>A key goal of the activity system is for entities to react intelligently to their surroundings.
+Interruptions therefore need to be handled as well as the success case.</p>
+<p>Juggling all the state manually while balancing the event free-for-all that was subactivities
+massively complicated this, which led to annoying bugs and edge cases.</p>
+<p>But that's enough wallowing in self-pity, let's get onto the new design.</p>
+<h2 id="the-way-of-async"><a name="impatience"/>The way of <code>async</code></h2>
+<p>I'll get into the implementation details of the custom <code>async</code> executor in a future post; for now
+I'll show its API and how it makes implementing new activities so much easier.</p>
+<p>The wander behaviour is a simple example that demonstrates a pure activity that only uses
+subactivities without any of its own event handling:</p>
+<div class="code" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #8f5902; font-style: italic">// pseudo-code</span>
+<span style="color: #204a87; font-weight: bold">async</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87; font-weight: bold">fn</span> <span style="color: #000000">wander_activity</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">ctx</span><span style="color: #000000; font-weight: bold">)</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #204a87; font-weight: bold">loop</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #8f5902; font-style: italic">// walk to a nearby position</span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #204a87; font-weight: bold">let</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">pos</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">=</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">choose_wander_destination</span><span style="color: #000000; font-weight: bold">();</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #000000">ctx</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">go_to</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">pos</span><span style="color: #000000; font-weight: bold">).</span><span style="color: #204a87; font-weight: bold">await</span><span style="color: #ce5c00; font-weight: bold">?</span><span style="color: #000000; font-weight: bold">;</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #8f5902; font-style: italic">// loiter for a few seconds</span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #000000">ctx</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">update_status</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">Loitering</span><span style="color: #000000; font-weight: bold">);</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #000000">ctx</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">wait</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #0000cf; font-weight: bold">3</span><span style="color: #000000; font-weight: bold">).</span><span style="color: #204a87; font-weight: bold">await</span><span style="color: #000000; font-weight: bold">;</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+</code></pre></div>
+
+
+<p>Compare its <a href="https://github.com/DomWilliams0/name-needed/blob/87d3cdd4dddccd18d395acb1c2002657b74b5b54/game/simulation/src/activity/activity/wander.rs#L40">new
+implementation</a>
+with the <a href="https://github.com/DomWilliams0/name-needed/blob/2431395fc022a500bcfd19c5c97bde7d4bc9e53a/game/simulation/src/activity/activities/wander.rs#L48">old
+</a>
+- what a difference!</p>
+<h3 id="linear-control-flow">Linear control flow</h3>
+<p>The control flow is very easy to follow; there's no jumping around between functions. There's also
+no manual state wrangling, even though implicitly there are three (initial, going to the wander
+destination, loitering there).</p>
+<p>The beauty of <code>async/await</code> is that the compiler is generating these automatically, with all the
+boilerplate for managing them. This includes the state of local variables, but I'm getting ahead of
+myself - see below.</p>
+<h3 id="self-contained-subactivities">Self-contained subactivities</h3>
+<p>It uses the <code>go_to</code> and <code>wait</code> subactivities, which have the same behaviour as before, but look - no
+leakage! The activity needs no event handler of its own, because all event handling is fully
+contained within the subactivities. How it does this will be covered in a future post.</p>
+<p>Another bonus is that there is no longer any <code>Subactivity</code> trait, as they can be implemented as
+simple <code>async</code> methods.</p>
+<h3 id="interruptions-via-raii">Interruptions via RAII</h3>
+<p>As the state of local variables is automatically tracked for us by the compiler, this makes it
+really easy to handle interruptions via destructors. Let's have a look inside the <code>go_to</code>
+subactivity<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>:</p>
+<div class="code" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #8f5902; font-style: italic">// semi pseudo-code</span>
+<span style="color: #204a87; font-weight: bold">struct</span> <span style="color: #000000">GotoSubactivity</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">..</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #204a87; font-weight: bold">impl</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">GotoSubactivity</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #204a87; font-weight: bold">async</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87; font-weight: bold">fn</span> <span style="color: #000000">go_to</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #ce5c00; font-weight: bold">&amp;</span><span style="color: #3465a4">self</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">ctx</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">destination</span><span style="color: #000000; font-weight: bold">)</span><span style="color: #f8f8f8; text-decoration: underline"> </span>-&gt; <span style="color: #204a87">Result</span><span style="color: #ce5c00; font-weight: bold">&lt;</span><span style="color: #000000; font-weight: bold">(),</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">GotoError</span><span style="color: #ce5c00; font-weight: bold">&gt;</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #8f5902; font-style: italic">// request navigation to destination, and get a unique token back [^2]</span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #204a87; font-weight: bold">let</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">path_token</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">=</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">request_navigation_to</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">destination</span><span style="color: #000000; font-weight: bold">);</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #8f5902; font-style: italic">// await specific arrival event</span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #204a87; font-weight: bold">let</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">goto_result</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">=</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">ctx</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">          </span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">subscribe_to_specific_until</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">me</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">EntityEventType</span>::<span style="color: #000000">Arrived</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">|</span><span style="color: #000000">evt</span><span style="color: #ce5c00; font-weight: bold">|</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87; font-weight: bold">match</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">evt</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">              </span><span style="color: #000000">EntityEventPayload</span>::<span style="color: #000000">Arrived</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">token</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">result</span><span style="color: #000000; font-weight: bold">)</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87; font-weight: bold">if</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">token</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">==</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">path_token</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">=&gt;</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87">Ok</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">result</span><span style="color: #000000; font-weight: bold">),</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">              </span><span style="color: #000000">_</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">=&gt;</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87">Err</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">evt</span><span style="color: #000000; font-weight: bold">),</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #8f5902; font-style: italic">// other unhandled events</span>
+<span style="color: #f8f8f8; text-decoration: underline">          </span><span style="color: #000000; font-weight: bold">})</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">          </span><span style="color: #000000; font-weight: bold">.</span><span style="color: #204a87; font-weight: bold">await</span><span style="color: #000000; font-weight: bold">;</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #204a87; font-weight: bold">let</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">result</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">=</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87; font-weight: bold">match</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">goto_result</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">            </span><span style="color: #204a87">None</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">=&gt;</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87; font-weight: bold">return</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87">Err</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">GotoError</span>::<span style="color: #000000">Cancelled</span><span style="color: #000000; font-weight: bold">),</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #8f5902; font-style: italic">// bail out early</span>
+<span style="color: #f8f8f8; text-decoration: underline">            </span><span style="color: #204a87">Some</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #204a87">Ok</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">_</span><span style="color: #000000; font-weight: bold">))</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">=&gt;</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87">Ok</span><span style="color: #000000; font-weight: bold">(()),</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">            </span><span style="color: #204a87">Some</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #204a87">Err</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">err</span><span style="color: #000000; font-weight: bold">))</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">=&gt;</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87">Err</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">err</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">into</span><span style="color: #000000; font-weight: bold">()),</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #000000; font-weight: bold">};</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #8f5902; font-style: italic">// track completion</span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #3465a4">self</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">complete</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">=</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87; font-weight: bold">true</span><span style="color: #000000; font-weight: bold">;</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #000000">result</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #8f5902; font-style: italic">// destructor</span>
+<span style="color: #204a87; font-weight: bold">impl</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87">Drop</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87; font-weight: bold">for</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">GotoSubactivity</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #204a87; font-weight: bold">fn</span> <span style="color: #000000">drop</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #ce5c00; font-weight: bold">&amp;</span><span style="color: #204a87; font-weight: bold">mut</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #3465a4">self</span><span style="color: #000000; font-weight: bold">)</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #204a87; font-weight: bold">if</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">!</span><span style="color: #3465a4">self</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">complete</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">            </span><span style="color: #3465a4">self</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">ctx</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">abort_path</span><span style="color: #000000; font-weight: bold">();</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">        </span><span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+</code></pre></div>
+
+
+<p>When the wander activity invokes <code>ctx.go_to</code>, this instantiates a <code>GotoSubactivity</code> on the stack,
+which contains a <code>bool</code> field <code>complete</code> to track the state. Its destructor <code>drop</code> is invoked
+on return in all cases, for completion <strong>as well as interruptions</strong>.</p>
+<p>Within the destructor we can then cancel the navigation if it was not completed. In other behaviours
+like hauling we can do more complicated interruption handling such as dropping the item on the
+ground.</p>
+<h3 id="activity-status">Activity status</h3>
+<p>Although not specific to the <code>async</code> runtime, there has been an improvement to the subactivity info
+displayed in the UI. Previously the current subactivity was displayed in the UI, as seen below
+(borrowed from <a href="/devlog4">devlog 4</a>):</p>
+<p><span class="img_container" style="display: inline-block;"><img alt="GIF of current subactivity shown in the UI" src="https://domwilliams0.github.io/images/devlog4-subactivity.gif" style="display:block; margin-left: auto; margin-right: auto;" title="Previous implementation showing the current activity and subactivity." /><span class="img_caption" style="display: block; text-align: center;">Previous implementation showing the current activity and subactivity.</span></span></p>
+<p>This was restricted to the type of the subactivity, so it could not be very easily customised to
+show more fine-grained steps.</p>
+<p>The API now looks like this:</p>
+<div class="code" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #204a87; font-weight: bold">pub</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87; font-weight: bold">trait</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">Status</span>: <span style="color: #000000">Display</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #204a87; font-weight: bold">fn</span> <span style="color: #000000">exertion</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #ce5c00; font-weight: bold">&amp;</span><span style="color: #3465a4">self</span><span style="color: #000000; font-weight: bold">)</span><span style="color: #f8f8f8; text-decoration: underline"> </span>-&gt; <span style="color: #204a87; font-weight: bold">f32</span><span style="color: #000000; font-weight: bold">;</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+
+<span style="color: #204a87; font-weight: bold">impl</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">ActivityContext</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #f8f8f8; text-decoration: underline">    </span><span style="color: #204a87; font-weight: bold">fn</span> <span style="color: #000000">update_status</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #ce5c00; font-weight: bold">&amp;</span><span style="color: #3465a4">self</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">status</span>: <span style="color: #000000">impl</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000">Status</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">+</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #204a87">&#39;static</span><span style="color: #000000; font-weight: bold">)</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #ce5c00; font-weight: bold">..</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+<span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8; text-decoration: underline"></span>
+</code></pre></div>
+
+
+<p>This lets an activity <em>or</em> subactivity define its own self-contained types for the current task, which allows
+for more useful status information, like the following:</p>
+<p><span class="img_container" style="display: inline-block;"><img alt="GIF of more details activity status" src="https://domwilliams0.github.io/images/devlog6-activity-status.gif" style="display:block; margin-left: auto; margin-right: auto;" title="As the entity collects materials for a build, there are many more status updates than previously." /><span class="img_caption" style="display: block; text-align: center;">As the entity collects materials for a build, there are many more status updates than previously.</span></span></p>
+<h2 id="was-the-churn-worth-it">Was the churn worth it?</h2>
+<p>This effort took multiple months of rewriting a whole lot of code<sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup> that itself was only a few months
+old (and already documented in a devlog!), and seems to be the very definition of unnecessary code churn.</p>
+<p>However I think in this case it was warranted; the feeling of despair that hit me when looking to
+add a new "go to and build block" activity would not have led to much enthusiasm for working on the
+project. The only way I can keep up the motivation to work on this game for years is if the codebase
+is a pleasure to work on, which this refactor has contributed to!</p>
+<p>Next up is a deep dive into the internals of the custom async runtime.</p>
+<p><em>Or a detour into other interesting topics like engine integration tests, terrain generation or data-driven architecture... I've made a lot of dev progress in the last
+year that needs writing about!</em></p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>Trying to look at a real code example isn't a nice experience, but <a href="https://github.com/DomWilliams0/name-needed/blob/2431395fc022a500bcfd19c5c97bde7d4bc9e53a/game/simulation/src/activity/activities/go_haul.rs#L68">here's a
+  link</a>
+  to the 500 lines of state management for the hauling activity.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>The path token returned from <code>request_navigation_to</code> serves to identify our specific path
+  request amongst potentially many. This can happen when a new destination is requested while
+  another is in progress; a cancellation event for the original will be triggered (<code>Arrived(token,
+  Err(GotoError::Cancelled))</code>), which unless filtered on the token will match the arrival logic and
+  erroneously terminate the goto early.&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:3">
+<p>And time spent dev'ing is time not spent writing devlogs... The rate at which I get these out is
+  due to increase substantially.&#160;<a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+    </article>
+</main>
+
+<footer>
+    <div class="prev-next">
+    <span><a href="/devlog5">← Devlog #5: voxel world goals</a></span>
+    <span>&nbsp;</span>
+</div>
+
+    <hr/> <br/>
+    <p>Return to <a href="/">home</a> | Subscribe to <a href="/index.xml">RSS</a> | Send me an <a href="mailto:contact@domwillia.ms">email</a> | Follow me on <a href="https://github.com/DomWilliams0">GitHub</a></p>
+</footer>
+</body>
+</html>
+
