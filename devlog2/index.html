@@ -8,7 +8,7 @@
     <meta name="description" content="A deep dive into my game engine architecture, looking at how the simulation is entirely separate from its visual representation."/>
     <meta name="author" content="Dom Williams">
     <!--<meta name="keywords" content="rust, gamedev, devlog, name-needed, architecture, game-engine"/>-->
-    <style type="text/css">:root{font-family:"Helvetica Neue",system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:#333;background-color:#fefefe;text-rendering:optimizeLegibility;font-size:16pt}body{max-width:38rem;padding:1rem;margin:auto}video{max-width:35rem;margin:auto;display:block}pre{padding:20px;border-radius:8px;overflow:auto}code{overflow:scroll;overflow-y:auto;overflow-x:auto;font-family:Consolas,Monaco,Andale Mono,Ubuntu Mono,monospace;-webkit-font-feature-settings:normal;-moz-font-feature-settings:normal;font-feature-settings:normal;padding:3px;margin:3px;border-radius:4px;font-weight:400;background:#ececee}pre code{background:none !important;color:#ccc}article{line-height:1.6rem;display:block}blockquote{border-left:2px solid;margin:40px 15px;padding:10px;font-style:italic}@media(max-width:683px){blockquote{margin:10px;padding:10px}}blockquote:before{content:"”";font-family:Georgia,serif;font-size:3.875rem;position:absolute;left:-40px;top:-20px}blockquote p:first-of-type{margin-top:0}blockquote p:last-of-type{margin-bottom:0}.article-date{color:#777;margin-bottom:20px}main header{margin:0}main header h1{margin-bottom:0}.article-title{font-size:2rem}.prev-next{width:100%}.next{float:right}nav#toc ul{list-style-type:disc;padding-left:10px;margin-left:10px}#toc{float:right;margin:0 1.5rem;background-color:#fafafa;padding:.5rem .5rem;border-radius:4px;line-height:1.5rem}#toc a,#toc a:visited{color:#0679a7}@media(max-width:500px){#toc{float:none;margin:auto;width:70%}.header-nav{display:block !important;float:none !important;text-align:center}:root{font-size:12pt}}#blog-header{border-bottom:2px solid #333;margin:0 auto 5px;display:block;overflow:hidden}#blog-header h1{font-size:1.6rem}#blog-header nav{float:right}.link5eva a:visited,.link5eva a{color:var(--color)}#blog-header a{text-decoration:none;display:inline-block}#blog-header a:hover{color:#414141}.header-nav{display:inline;margin:auto;padding:.5rem 0}.icons svg{width:1rem;height:auto;padding:0 10px;color:#111}.footnote,.footnote p{font-size:.9em;font-style:italic;line-height:1.4}.footnote{font-style:normal}.footnote-ref{padding:0 .2rem}.img_container{height:auto;display:block !important}.img_container img{display:inline-block;max-width:90%}.img_caption{text-align:left;font-size:.9em;font-style:italic}.hidden{display:none}#intro p,#intro li{font-size:.9rem}footer p{margin-top:0;font-size:.8rem;text-align:center;color:#5e5e5e}.note-aside:before{content:"Sidenote: ";font-weight:bold}.note-aside{background-color:#d3e9f5;border-color:#bde6fc}.note-info{background-color:#dff0d8;border-color:#daf7cd}aside{border-width:1px;border-style:double;border-radius:10px;padding:.5rem .5rem;font-size:.9rem}</style>
+    <style type="text/css">:root{font-family:"Helvetica Neue",system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:#333;background-color:#fefefe;text-rendering:optimizeLegibility;font-size:13pt}body{max-width:38rem;padding:1rem;margin:auto}video{max-width:35rem;margin:auto;display:block}pre{padding:5px;border-radius:8px;overflow:auto}code{overflow:scroll;overflow-y:auto;overflow-x:auto;font-family:monospace;font-size:smaller;-webkit-font-feature-settings:normal;-moz-font-feature-settings:normal;font-feature-settings:normal;padding:1.5px;border-radius:4px;font-weight:400;background:#ececee}pre code{background:none !important;color:#ccc;margin:0;padding:0;line-height:1.1em}article{line-height:1.3rem;display:block;padding-top:.5rem}blockquote{border-left:2px solid;margin:40px 15px;padding:10px;font-style:italic}@media(max-width:683px){blockquote{margin:10px;padding:10px}}blockquote:before{content:"”";font-family:Georgia,serif;font-size:3.875rem;position:absolute;left:-40px;top:-20px}blockquote p:first-of-type{margin-top:0}blockquote p:last-of-type{margin-bottom:0}.article-date{color:#777;margin-bottom:20px}main header{margin:0}main header h1{margin-bottom:0}.article-title{font-size:2rem}.prev-next{width:100%}.next{float:right}nav#toc ul{list-style-type:disc;padding-left:10px;margin-left:10px}#toc{float:right;margin:0 1.5rem;background-color:#fafafa;padding:.5rem .5rem;border-radius:4px;line-height:1.5rem}#toc a,#toc a:visited{color:#0679a7}@media(max-width:500px){#toc{float:none;margin:auto;width:70%}.header-nav{display:block !important;float:none !important;text-align:center}}#blog-header{border-bottom:2px solid #333;margin:0 auto 5px;display:block;overflow:hidden}#blog-header h1{font-size:1.6rem}#blog-header nav{float:right}.link5eva a:visited,.link5eva a{color:var(--color)}#blog-header a{text-decoration:none;display:inline-block}#blog-header a:hover{color:#414141}.header-nav{display:inline;margin:auto;padding:.5rem 0}.icons svg{width:1rem;height:auto;padding:0 10px;color:#111}.footnote,.footnote p{font-size:.9em;font-style:italic;line-height:1.4}.footnote{font-style:normal}sup{vertical-align:super;line-height:0;font-size:.83em;padding:.1em .2em}.img_container{height:auto;display:block !important}.img_container img{display:inline-block;max-width:90%}.img_caption{text-align:left;font-size:.9em;font-style:italic}.hidden{display:none}#intro p,#intro li{font-size:.9rem}footer p{margin-top:0;font-size:.8rem;text-align:center;color:#5e5e5e}.note-aside:before{content:"Sidenote: ";font-weight:bold}.note-info{background-color:#dff0d8;border-color:#daf7cd}aside{border-width:1px;border-style:double;border-radius:10px;padding:.1rem .5rem;font-size:.9rem;background-color:#d3e9f5;border-color:#bde6fc}</style>
 </head>
 
 <body>
@@ -82,16 +82,16 @@
         </nav>
 
         <p>One of the foundational concepts on which I've built my <a href="https://github.com/DomWilliams0/name-needed">game engine</a> is the <strong>separation of concerns</strong>. The game simulation is entirely separate from the rendering, fully agnostic to however it appears to the player and how they interact with it.</p>
-<h2 id="why-bother">Why bother?</h2>
+<h1 id="why-bother">Why bother?</h1>
 <p>Keeping the simulation separate from its visual representation is very powerful, and delightfully conceptually clean. It lets you run the game on your continuous integration (CI) server without needing to faff around with trying to get an OpenGL context on a headless VM. In the same vein, it makes it easy to switch between multiple renderer implementations without any code changes at compile time (or runtime if you <em>really</em> wanted to)<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>.</p>
 <p>Other advantages include the ability to fast forward the simulation at hundreds or thousands of ticks per second, and reusing the same simulation code for client- and server-side in networked games.</p>
 <p>Let's get on with it.</p>
-<h2 id="architecture">Architecture</h2>
+<h1 id="architecture">Architecture</h1>
 <p><span class="img_container" style="display: inline-block;"><img alt="A high-level diagram of the engine architecture" src="https://domwilliams0.github.io/images/devlog2-architecture.png" style="display:block; margin-left: auto; margin-right: auto;" title="A summary of the engine architecture." /><span class="img_caption" style="display: block; text-align: center;">A summary of the engine architecture.</span></span></p>
 <p>This summarises the architecture of the game engine at a very high level. We'll visit the relevant components in turn, looking at the inputs, outputs and responsibilities of each.</p>
-<h3 id="the-simulation">The simulation</h3>
+<h2 id="the-simulation">The simulation</h2>
 <p>The game and all its logic live here. It owns all the entities that live in the game world, the logic and systems that apply to them. It exports 2 main methods to the game engine.</p>
-<h4 id="tick">Tick</h4>
+<h3 id="tick">Tick</h3>
 <p><code>tick(camera, ui_commands)</code></p>
 <p>Advances the simulation a single tick. Note the lack of deltatime/dt - it is totally independent of real-world time or tick rates. The caller is free to decide on its timestep (i.e. 20tps in the game, as fast as possible in tests).</p>
 <p>The simulation is isolated from the outside world, having no way to directly access the player's input e.g. mouse clicks, keypresses. Instead, it is passed a collection of <strong>renderer-agnostic</strong> <code>UiCommand</code>s and <code>InputEvent</code>s on each tick. These are collected by the engine from the backend (via mouse, keyboard, joystick, steering wheel, etc.) in the time between ticks, and processed all at once in the next tick.</p>
@@ -126,7 +126,7 @@
 <li>Run entity-component-system (ECS) systems, i.e. the majority of the game logic</li>
 <li>End-of-tick maintenance (applying deferred updates generated by the previous step e.g. insertion/removal of entities)</li>
 </ul>
-<h4 id="render">Render</h4>
+<h3 id="render">Render</h3>
 <p><code>render(camera, render_target, interpolation, input_events) -&gt; ui_blackboard</code></p>
 <p>Renders a single frame of the current game state, interpolated with the given <code>interpolation</code> value for smooth movement as covered in the previous <a href="/devlog1">devlog</a>. This allows for rendering the simulation at 60fps while ticking at only 20tps.</p>
 <p>As in <code>tick</code>, the <code>camera</code> input defines the visible area of the world. The simulation is only concerned with rendering <em>entities</em> as opposed to terrain, which is handled by the backend, described below.</p>
@@ -140,9 +140,9 @@
 <li>Render debug shapes (coloured lines and simple shapes to aid debugging)</li>
 <li>Gather game data for the UI</li>
 </ul>
-<h3 id="the-backend">The backend</h3>
+<h2 id="the-backend">The backend</h2>
 <p>The backend represents the renderer and is the interface between the player and the game. In this section I will be describing the current concrete implementation that uses SDL2 for window management and event handling, ImGui for the UI, and OpenGL for drawing.</p>
-<h4 id="tick_1">Tick</h4>
+<h3 id="tick_1">Tick</h3>
 <p><code>tick()</code></p>
 <p>Unbelievable, a simple function signature. Like the simulation, the backend is ticked 20 times per second. Its main responsibility is ticking the camera, moving it around based on user input. The camera's position is treated as any other game object, updated with a fixed timestep but interpolated every frame to result in smooth motion.</p>
 <p>Although the world's terrain data lives in the simulation, its <strong>mesh</strong> (visual representation) lives in the backend. When terrain is modified, the backend needs to regenerate the mesh to represent the change. As an optimisation, only the meshes of terrain regions that are visible to the player are updated.</p>
@@ -151,7 +151,7 @@
 <li>Update the camera's position</li>
 <li>Regenerate meshes for visible, modified world regions</li>
 </ul>
-<h4 id="render_1">Render</h4>
+<h3 id="render_1">Render</h3>
 <p><code>render(simulation, interpolation) -&gt; ui_commands</code></p>
 <p>This is where everything the player sees is rendered, i.e. the terrain, the simulation, and the UI. I'll start with the summary this time:</p>
 <ul>
@@ -163,7 +163,7 @@
 </ul>
 <p>The terrain and entities are rendered at their correct Z coordinate<sup id="fnref:5"><a class="footnote-ref" href="#fn:5">5</a></sup> (i.e. the vertical axis in world space) with depth testing, so the render order technically doesn't matter in this case - terrain overhangs will occlude entities as expected.</p>
 <p>As mentioned above, rendering the simulation produces a <strong>UI blackboard</strong>. This holds information such as the current selected entity, details about them (e.g. hunger, current navigation destination, current activity), and is passed to the UI to be rendered in a simple immediate-mode GUI. Commands issued from the UI are collected and passed to the simulation on the next tick.</p>
-<h4 id="consume-window-events">Consume window events</h4>
+<h3 id="consume-window-events">Consume window events</h3>
 <p><code>consume_events() -&gt; outcome</code></p>
 <p>This is where the backend interacts with the operating system, receiving SDL2 events for clicks/window resizes/keystrokes that are translated into <code>InputEvent</code>s. It is called by the engine at the beginning of each game loop iteration, before any <code>tick</code>ing or <code>render</code>ing. In nearly all cases these window events are handled internally in the backend or simulation, but there are a couple that affect the engine itself - for example, clicking the window close button or sending a <code>SIGINT</code> to the process.</p>
 <p>After handling the queued window events for this frame, an <code>outcome</code> is returned to the engine. This can take one of the following self-explanatory values:</p>
@@ -172,7 +172,7 @@
 <li><strong>Exit</strong> - exit the game</li>
 <li><strong>Restart</strong> - destroy the simulation and start a new one</li>
 </ul>
-<h3 id="the-engine">The engine</h3>
+<h2 id="the-engine">The engine</h2>
 <p>The main job of the engine is simply to call these methods on the backend and simulation, passing data between them. The core of it can be described in Rust-like pseudocode:</p>
 <div class="code" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><code><span style="color: #8f5902; font-style: italic">// the core game loop</span>
 <span style="color: #204a87; font-weight: bold">loop</span><span style="color: #f8f8f8; text-decoration: underline"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8; text-decoration: underline"></span>
@@ -198,7 +198,7 @@
 </code></pre></div>
 
 
-<h2 id="summary">Summary</h2>
+<h1 id="summary">Summary</h1>
 <p>I'm sure you're clamouring to know <em>how exactly</em> the game is initialised and restarts itself, but this post has gone on long enough. In the future I will address this along with the concept of <strong>presets</strong>, which describe how to setup the game in terms of world generation, entity population, etc for different scenarios such as development, testing, and gameplay.</p>
 <div class="footnote">
 <hr />

@@ -8,7 +8,7 @@
     <meta name="description" content="An overview of many months of churning the entity activity system to use Rust's async/await support, for a much nicer design."/>
     <meta name="author" content="Dom Williams">
     <!--<meta name="keywords" content="rust, gamedev, devlog, name-needed, game-engine, async, await, activity, ai, behavior"/>-->
-    <style type="text/css">:root{font-family:"Helvetica Neue",system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:#333;background-color:#fefefe;text-rendering:optimizeLegibility;font-size:16pt}body{max-width:38rem;padding:1rem;margin:auto}video{max-width:35rem;margin:auto;display:block}pre{padding:20px;border-radius:8px;overflow:auto}code{overflow:scroll;overflow-y:auto;overflow-x:auto;font-family:Consolas,Monaco,Andale Mono,Ubuntu Mono,monospace;-webkit-font-feature-settings:normal;-moz-font-feature-settings:normal;font-feature-settings:normal;padding:3px;margin:3px;border-radius:4px;font-weight:400;background:#ececee}pre code{background:none !important;color:#ccc}article{line-height:1.6rem;display:block}blockquote{border-left:2px solid;margin:40px 15px;padding:10px;font-style:italic}@media(max-width:683px){blockquote{margin:10px;padding:10px}}blockquote:before{content:"”";font-family:Georgia,serif;font-size:3.875rem;position:absolute;left:-40px;top:-20px}blockquote p:first-of-type{margin-top:0}blockquote p:last-of-type{margin-bottom:0}.article-date{color:#777;margin-bottom:20px}main header{margin:0}main header h1{margin-bottom:0}.article-title{font-size:2rem}.prev-next{width:100%}.next{float:right}nav#toc ul{list-style-type:disc;padding-left:10px;margin-left:10px}#toc{float:right;margin:0 1.5rem;background-color:#fafafa;padding:.5rem .5rem;border-radius:4px;line-height:1.5rem}#toc a,#toc a:visited{color:#0679a7}@media(max-width:500px){#toc{float:none;margin:auto;width:70%}.header-nav{display:block !important;float:none !important;text-align:center}:root{font-size:12pt}}#blog-header{border-bottom:2px solid #333;margin:0 auto 5px;display:block;overflow:hidden}#blog-header h1{font-size:1.6rem}#blog-header nav{float:right}.link5eva a:visited,.link5eva a{color:var(--color)}#blog-header a{text-decoration:none;display:inline-block}#blog-header a:hover{color:#414141}.header-nav{display:inline;margin:auto;padding:.5rem 0}.icons svg{width:1rem;height:auto;padding:0 10px;color:#111}.footnote,.footnote p{font-size:.9em;font-style:italic;line-height:1.4}.footnote{font-style:normal}.footnote-ref{padding:0 .2rem}.img_container{height:auto;display:block !important}.img_container img{display:inline-block;max-width:90%}.img_caption{text-align:left;font-size:.9em;font-style:italic}.hidden{display:none}#intro p,#intro li{font-size:.9rem}footer p{margin-top:0;font-size:.8rem;text-align:center;color:#5e5e5e}.note-aside:before{content:"Sidenote: ";font-weight:bold}.note-aside{background-color:#d3e9f5;border-color:#bde6fc}.note-info{background-color:#dff0d8;border-color:#daf7cd}aside{border-width:1px;border-style:double;border-radius:10px;padding:.5rem .5rem;font-size:.9rem}</style>
+    <style type="text/css">:root{font-family:"Helvetica Neue",system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:#333;background-color:#fefefe;text-rendering:optimizeLegibility;font-size:13pt}body{max-width:38rem;padding:1rem;margin:auto}video{max-width:35rem;margin:auto;display:block}pre{padding:5px;border-radius:8px;overflow:auto}code{overflow:scroll;overflow-y:auto;overflow-x:auto;font-family:monospace;font-size:smaller;-webkit-font-feature-settings:normal;-moz-font-feature-settings:normal;font-feature-settings:normal;padding:1.5px;border-radius:4px;font-weight:400;background:#ececee}pre code{background:none !important;color:#ccc;margin:0;padding:0;line-height:1.1em}article{line-height:1.3rem;display:block;padding-top:.5rem}blockquote{border-left:2px solid;margin:40px 15px;padding:10px;font-style:italic}@media(max-width:683px){blockquote{margin:10px;padding:10px}}blockquote:before{content:"”";font-family:Georgia,serif;font-size:3.875rem;position:absolute;left:-40px;top:-20px}blockquote p:first-of-type{margin-top:0}blockquote p:last-of-type{margin-bottom:0}.article-date{color:#777;margin-bottom:20px}main header{margin:0}main header h1{margin-bottom:0}.article-title{font-size:2rem}.prev-next{width:100%}.next{float:right}nav#toc ul{list-style-type:disc;padding-left:10px;margin-left:10px}#toc{float:right;margin:0 1.5rem;background-color:#fafafa;padding:.5rem .5rem;border-radius:4px;line-height:1.5rem}#toc a,#toc a:visited{color:#0679a7}@media(max-width:500px){#toc{float:none;margin:auto;width:70%}.header-nav{display:block !important;float:none !important;text-align:center}}#blog-header{border-bottom:2px solid #333;margin:0 auto 5px;display:block;overflow:hidden}#blog-header h1{font-size:1.6rem}#blog-header nav{float:right}.link5eva a:visited,.link5eva a{color:var(--color)}#blog-header a{text-decoration:none;display:inline-block}#blog-header a:hover{color:#414141}.header-nav{display:inline;margin:auto;padding:.5rem 0}.icons svg{width:1rem;height:auto;padding:0 10px;color:#111}.footnote,.footnote p{font-size:.9em;font-style:italic;line-height:1.4}.footnote{font-style:normal}sup{vertical-align:super;line-height:0;font-size:.83em;padding:.1em .2em}.img_container{height:auto;display:block !important}.img_container img{display:inline-block;max-width:90%}.img_caption{text-align:left;font-size:.9em;font-style:italic}.hidden{display:none}#intro p,#intro li{font-size:.9rem}footer p{margin-top:0;font-size:.8rem;text-align:center;color:#5e5e5e}.note-aside:before{content:"Sidenote: ";font-weight:bold}.note-info{background-color:#dff0d8;border-color:#daf7cd}aside{border-width:1px;border-style:double;border-radius:10px;padding:.1rem .5rem;font-size:.9rem;background-color:#d3e9f5;border-color:#bde6fc}</style>
 </head>
 
 <body>
@@ -83,14 +83,14 @@
 While the concept is still sound, the implementation became a total mess as more activity types
 were added.</p>
 <p>Since then I have refactored it all to use Rust's excellent <code>async/await</code> support. This post will
-cover the ergonomic API this gives us, and a future one will go into the guts of the implementation.</p>
-<h2 id="past-mistakes">Past mistakes</h2>
+cover the ergonomic API this gives us, and <a href="/devlog7">this one</a> will go into the guts of the implementation.</p>
+<h1 id="past-mistakes">Past mistakes</h1>
 <p>Before getting to the juicy new design, I'll first go over what exactly made the old implementation
 unbearable to work with. You can <a href="#impatience">skip to the next section</a> if you don't want to dwell
 on bad design decisions.</p>
 <p>So, what was wrong with the <a href="/devlog4">old implementation</a>? I think enough to justify a multi-month
 rewrite:</p>
-<h3 id="fragile-state-machine-boilerplate">Fragile state machine boilerplate</h3>
+<h2 id="fragile-state-machine-boilerplate">Fragile state machine boilerplate</h2>
 <p>Every activity had to manually implement a state machine to handle its own control flow. Despite a
 simple and linear flow of events (such as "go to this position, pick up the item, carry it here, drop it"),
 control flow would continually jump between <code>on_tick</code> and <code>on_event</code>, with a lot of boilerplate
@@ -135,7 +135,7 @@ getting in the way.</p>
 </code></pre></div>
 
 
-<h3 id="one-event-handler-for-all-states">One event handler for all states</h3>
+<h2 id="one-event-handler-for-all-states">One event handler for all states</h2>
 <p>As activities progress through different states, they will be subscribed to different events -
 the <code>Arrived</code> event during navigation, the <code>PickedUp</code> event when hauling an item, etc. This quickly 
 causes the single per-activity event handler to balloon in complexity, as it has to cope with
@@ -143,19 +143,19 @@ all combinations of event types with current state.</p>
 <p>There's no need for a pseudocode example of this, just marvel at the gross complexity in the <a href="https://github.com/DomWilliams0/name-needed/blob/2431395fc022a500bcfd19c5c97bde7d4bc9e53a/game/simulation/src/activity/activities/go_haul.rs#L265">haul
 activity event
 handler</a>.</p>
-<h3 id="no-event-handling-in-subactivities">No event handling in subactivities</h3>
+<h2 id="no-event-handling-in-subactivities">No event handling in subactivities</h2>
 <p>Subactivities were meant to enable easy sharing of common behaviour, like navigation. In practice
 this didn't provide as much convenience as expected, due to the flawed event handler design.</p>
 <p>Subactivities could subscribe to events but didn't have their own handler callback. This meant the
 calling activities had to know about their exact implementation details so they could handle the
 expected events... if this isn't the definition of "leaky abstraction" I don't know what is.</p>
-<h3 id="manual-interruption-handling">Manual interruption handling</h3>
+<h2 id="manual-interruption-handling">Manual interruption handling</h2>
 <p>A key goal of the activity system is for entities to react intelligently to their surroundings.
 Interruptions therefore need to be handled as well as the success case.</p>
 <p>Juggling all the state manually while balancing the event free-for-all that was subactivities
 massively complicated this, which led to annoying bugs and edge cases.</p>
 <p>But that's enough wallowing in self-pity, let's get onto the new design.</p>
-<h2 id="the-way-of-async"><a name="impatience"/>The way of <code>async</code></h2>
+<h1 id="the-way-of-async"><a name="impatience"/>The way of <code>async</code></h1>
 <p>I'll get into the implementation details of the custom <code>async</code> executor in a future post; for now
 I'll show its API and how it makes implementing new activities so much easier.</p>
 <p>The wander behaviour is a simple example that demonstrates a pure activity that only uses
@@ -180,20 +180,20 @@ implementation</a>
 with the <a href="https://github.com/DomWilliams0/name-needed/blob/2431395fc022a500bcfd19c5c97bde7d4bc9e53a/game/simulation/src/activity/activities/wander.rs#L48">old
 </a>
 - what a difference!</p>
-<h3 id="linear-control-flow">Linear control flow</h3>
+<h2 id="linear-control-flow">Linear control flow</h2>
 <p>The control flow is very easy to follow; there's no jumping around between functions. There's also
 no manual state wrangling, even though implicitly there are three (initial, going to the wander
 destination, loitering there).</p>
 <p>The beauty of <code>async/await</code> is that the compiler is generating these automatically, with all the
 boilerplate for managing them. This includes the state of local variables, but I'm getting ahead of
 myself - see below.</p>
-<h3 id="self-contained-subactivities">Self-contained subactivities</h3>
+<h2 id="self-contained-subactivities">Self-contained subactivities</h2>
 <p>It uses the <code>go_to</code> and <code>wait</code> subactivities, which have the same behaviour as before, but look - no
 leakage! The activity needs no event handler of its own, because all event handling is fully
 contained within the subactivities. How it does this will be covered in a future post.</p>
 <p>Another bonus is that there is no longer any <code>Subactivity</code> trait, as they can be implemented as
 simple <code>async</code> methods.</p>
-<h3 id="interruptions-via-raii">Interruptions via RAII</h3>
+<h2 id="interruptions-via-raii">Interruptions via RAII</h2>
 <p>As the state of local variables is automatically tracked for us by the compiler, this makes it
 really easy to handle interruptions via destructors. Let's have a look inside the <code>go_to</code>
 subactivity<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>:</p>
@@ -243,7 +243,7 @@ on return in all cases, for completion <strong>as well as interruptions</strong>
 <p>Within the destructor we can then cancel the navigation if it was not completed. In other behaviours
 like hauling we can do more complicated interruption handling such as dropping the item on the
 ground.</p>
-<h3 id="activity-status">Activity status</h3>
+<h2 id="activity-status">Activity status</h2>
 <p>Although not specific to the <code>async</code> runtime, there has been an improvement to the subactivity info
 displayed in the UI. Previously the current subactivity was displayed in the UI, as seen below
 (borrowed from <a href="/devlog4">devlog 4</a>):</p>
@@ -264,7 +264,7 @@ show more fine-grained steps.</p>
 <p>This lets an activity <em>or</em> subactivity define its own self-contained types for the current task, which allows
 for more useful status information, like the following:</p>
 <p><span class="img_container" style="display: inline-block;"><img alt="GIF of more details activity status" src="https://domwilliams0.github.io/images/devlog6-activity-status.gif" style="display:block; margin-left: auto; margin-right: auto;" title="As the entity collects materials for a build, there are many more status updates than previously." /><span class="img_caption" style="display: block; text-align: center;">As the entity collects materials for a build, there are many more status updates than previously.</span></span></p>
-<h2 id="was-the-churn-worth-it">Was the churn worth it?</h2>
+<h1 id="was-the-churn-worth-it">Was the churn worth it?</h1>
 <p>This effort took multiple months of rewriting a whole lot of code<sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup> that itself was only a few months
 old (and already documented in a devlog!), and seems to be the very definition of unnecessary code churn.</p>
 <p>However I think in this case it was warranted; the feeling of despair that hit me when looking to
