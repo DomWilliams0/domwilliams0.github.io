@@ -101,7 +101,7 @@ jargony mess.</p>
     execution takes place over many game ticks.</p>
 </li>
 <li>
-<p><strong>Activity</strong>: a living entity's current behaviour, such as "go here" or "pick that item up". Each
+<p><strong>Activity</strong>: a living entity's current behaviour, such as "go here" or "go pick up that item". Each
     instance of an activity is represented by a <strong>future</strong>, as these behaviours take time to
     complete (as covered in <a href="/devlog4">a previous devlog</a>).</p>
 </li>
@@ -170,7 +170,7 @@ jargony mess.</p>
 <p><a href="/devlog6#the-way-of-async">As we've seen before</a>, writing activities with futures is nice and
 ergonomic, but they need to be polled in order to be of any actual use. This requires a custom executor to
 be integrated into the game engine.</p>
-<p>The hardest bit was by far getting my head around the concepts of a runtime, tasks and futures, and
+<p>The hardest bit was getting my head around the concepts of a runtime, tasks and futures, and
 how they relate to each other in terms of ownership. The <a href="https://rust-lang.github.io/async-book/02_execution/04_executor.html">official async book</a> was really helpful here.</p>
 <h2 id="task-references">Task references</h2>
 <p>The core concept for a runtime is <strong>tasks</strong> - where do they live, and who owns them? </p>
@@ -438,7 +438,7 @@ implementation, including the fact that it may take place over many game ticks. 
 need to concern itself with event subscriptions either.</p>
 <aside>
 <p>Sometimes an activity <em>does</em> need to receive events, particularly those that are concerned with a
-target entity such as the "go to and pick this item up" behaviour.</p>
+target entity such as the "go to and pick up this item" behaviour.</p>
 <p>The target might be destroyed, picked up or otherwise made unavailable during navigation to it, but
 we don't want to have to wait until we get there to abort.</p>
 <p>Conveniently, an activity can also subscribe to events outside of a nested subactivity, and receive
@@ -585,7 +585,7 @@ where the loiter timer had to manually clear the path AND cancel the timer in it
 <p>We've seen what makes up a runtime, how tasks are allocated, used and interrupted, and how they are
 used to implement behaviours. I hope this breakdown helps others to make use of Rust's fantastic
 async features in their own games and engines.</p>
-<p>If you'd like to see how activities more complex that wandering make use of subactivities, have a
+<p>If you'd like to see how activities more complex than wandering make use of subactivities, have a
 look at:</p>
 <ul>
 <li><a href="https://github.com/DomWilliams0/name-needed/tree/41a9c1844db7745ef1ee815a7705bf5747ef7f86/game/simulation/src/activity/subactivity">All subactivities</a>,
