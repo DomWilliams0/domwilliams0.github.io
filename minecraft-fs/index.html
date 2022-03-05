@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>A FUSE filesystem for Minecraft</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="An overview and technical breakdown of a silly side project idea that possibly became a useful modding API for Minecraft."/>
+    <meta name="author" content="Dom Williams">
+    <!--<meta name="keywords" content="rust, minecraft, fuse, kotlin"/>-->
+    <style type="text/css">:root{font-family:"Helvetica Neue",system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:#333;background-color:#fefefe;text-rendering:optimizeLegibility;font-size:13pt}body{max-width:38rem;padding:1rem;margin:auto}video{max-width:35rem;margin:auto;display:block}pre{padding:5px;border-radius:8px;overflow:auto}code{overflow:scroll;overflow-y:auto;overflow-x:auto;font-family:monospace;font-size:smaller;-webkit-font-feature-settings:normal;-moz-font-feature-settings:normal;font-feature-settings:normal;padding:1.5px;border-radius:4px;font-weight:400;background:#ececee}pre code{background:none !important;color:#444;margin:0;padding:0;line-height:1.1em}article{line-height:1.3rem;display:block;padding-top:.5rem}blockquote{border-left:2px solid;margin:40px 15px;padding:10px;font-style:italic}@media(max-width:683px){blockquote{margin:10px;padding:10px}}blockquote:before{content:"”";font-family:Georgia,serif;font-size:3.875rem;position:absolute;left:-40px;top:-20px}blockquote p:first-of-type{margin-top:0}blockquote p:last-of-type{margin-bottom:0}.article-date{color:#777;margin-bottom:20px}main header{margin:0}main header h1{margin-bottom:0}.article-title{font-size:2rem}.prev-next{width:100%}.next{float:right}nav#toc ul{list-style-type:disc;padding-left:10px;margin-left:10px}#toc{float:right;margin:0 1.5rem;background-color:#fafafa;padding:.5rem .5rem;border-radius:4px;line-height:1.5rem}#toc a,#toc a:visited{color:#0679a7}@media(max-width:500px){#toc{float:none;margin:auto;width:70%}.header-nav{display:block !important;float:none !important;text-align:center}}#blog-header{border-bottom:2px solid #333;margin:0 auto 5px;display:block;overflow:hidden}#blog-header h1{font-size:1.6rem}#blog-header nav{float:right}.link5eva a:visited,.link5eva a{color:var(--color)}#blog-header a{text-decoration:none;display:inline-block}#blog-header a:hover{color:#414141}.header-nav{display:inline;margin:auto;padding:.5rem 0}.icons svg{width:1rem;height:auto;padding:0 10px;color:#111}.footnote,.footnote p{font-size:.9em;font-style:italic;line-height:1.4}.footnote{font-style:normal}sup{vertical-align:super;line-height:0;font-size:.83em;padding:.1em .2em}.img_container{height:auto;display:block !important}.img_container img{display:inline-block;max-width:90%}.img_caption{text-align:left;font-size:.9em;font-style:italic}.hidden{display:none}#intro p,#intro li{font-size:.9rem}footer p{margin-top:0;font-size:.8rem;text-align:center;color:#5e5e5e}.note-aside:before{content:"Sidenote: ";font-weight:bold}.note-info{background-color:#dff0d8;border-color:#daf7cd}aside{border-width:1px;border-style:double;border-radius:10px;padding:.1rem .5rem;font-size:.9rem;background-color:#d3e9f5;border-color:#bde6fc}</style>
+</head>
+
+<body>
+<header id="blog-header">
+    <div class="link5eva">
+        <h1 class="notalink header-nav"><a href="/" title="Return to root">Dom Williams</a></h1>
+        <nav class="icons header-nav">
+            <a href="/index.xml" title="RSS feed">
+                <span class="hidden">RSS</span>
+                <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>RSS</title>
+                    <path d="M19.199 24C19.199 13.467 10.533 4.8 0 4.8V0c13.165 0 24 10.835 24 24h-4.801zM3.291 17.415c1.814 0 3.293 1.479 3.293 3.295 0 1.813-1.485 3.29-3.301 3.29C1.47 24 0 22.526 0 20.71s1.475-3.294 3.291-3.295zM15.909 24h-4.665c0-6.169-5.075-11.245-11.244-11.245V8.09c8.727 0 15.909 7.184 15.909 15.91z"/>
+                </svg>
+            </a>
+            <a href="https://github.com/DomWilliams0" title="GitHub">
+                <span class="hidden">GitHub</span>
+                <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>GitHub</title>
+                    <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+                </svg>
+            </a>
+            <a href="mailto:contact@domwillia.ms" title="Contact Me">
+                <span class="hidden">Email</span>
+                <!-- icon from Font Awesome: https://fontawesome.com/license-->
+                <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="envelope"
+                     class="svg-inline--fa fa-envelope fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg"
+                     viewBox="0 0 512 512">
+                    <path fill="currentColor"
+                          d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+                </svg>
+
+            </a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <header>
+        <h1 class="article-title">A FUSE filesystem for Minecraft</h1>
+        <div class="article-date">
+            <time datetime="2022-03-05">05 Mar 2022</time>
+        </div>
+    </header>
+
+    <article>
+        <nav id="toc" class="link5eva">
+            <strong>Table of Contents</strong>
+            <div class="toc">
+<ul>
+<li><a href="#the-filesystem">The filesystem</a><ul>
+<li><a href="#static-entries">Static entries</a></li>
+<li><a href="#dynamic-entries">Dynamic entries</a><ul>
+<li><a href="#associated-entry-data">Associated entry data</a></li>
+</ul>
+</li>
+<li><a href="#phantom-entries">Phantom entries</a></li>
+</ul>
+</li>
+<li><a href="#architecture">Architecture</a></li>
+<li><a href="#a-use-case">A use case?</a></li>
+</ul>
+</div>
+
+        </nav>
+
+        <p><a href="https://github.com/DomWilliams0/minecraft-fs"><code>minecraft-fs</code></a> is a filesystem for Minecraft; that
+is, a virtual FUSE filesystem that allows querying and interaction with the game through reading and
+writing files. It was inspired by <a href="https://omar.website/tabfs/">TabFS</a> that does similar for
+interacting with a browser.</p>
+<p>It started as a silly but fascinating distraction from other projects, but became one that I
+realised I could actually get to a somewhat finished state in a reasonable time frame. </p>
+<h1 id="the-filesystem">The filesystem</h1>
+<p>The full filesystem structure can be found in the <a href="https://github.com/DomWilliams0/minecraft-fs/blob/develop/README.md">project
+README</a>, but for this post we'll deal with
+a cut-down version for simplicity: </p>
+<div class="code" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>├── player
+│   ├── entity -&gt; world/entities/by-id/135
+│   └── world -&gt; ../worlds/overworld
+└── worlds
+    ├── overworld
+    │   ├── entities
+    │   │   └── by-id
+    │   │       ├── 135
+    │   │       │   ├── position
+    │   │       │   └── type
+    │   │       ├── 140
+    │   │       │   ├── position
+    │   │       │   └── type
+    │   │       ...
+    │   ├── blocks
+    │   │   └── 100,64,200
+    │   │       ├── type
+</code></pre></div>
+
+<p>There are three types of entry - directories, symlinks and files.</p>
+<p>Some of these entries are hardcoded and unchanging such as the <code>player</code> directory, whereas others
+depend on the state of the game; the directory for entity <code>140</code> only exists if an entity with that
+ID is currently alive. We'll look into the differences between these shortly.</p>
+<p>Every entry in the filesystem has a unique 64-bit identifier known as an <strong>inode</strong>. Since this isn't
+a real filesystem that needs to be efficient with its bookkeeping, they can just be allocated
+willy-nilly by incrementing a counter as needed<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>.</p>
+<p>Every instance of an entry is unique, even if they behave identically. For example,
+the <code>position</code> file underneath the different entities have inodes 5005 and 5011 respectively.</p>
+<div class="code" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>$ ls -ilR mnt/worlds/overworld/entities/by-id # -i to show inodes
+5003 drwxr-xr-x - dom 28 Feb 13:17 135
+5009 drwxr-xr-x - dom 28 Feb 13:17 140
+
+./135:
+5005 .rwxr-xr-x 256 dom 28 Feb 13:17 position
+5007 .rwxr-xr-x 256 dom 28 Feb 13:17 type
+
+./140:
+5011 .rwxr-xr-x 256 dom 28 Feb 13:17 position
+5013 .rwxr-xr-x 256 dom 28 Feb 13:17 type
+</code></pre></div>
+
+<h2 id="static-entries">Static entries</h2>
+<p>Static inodes are the simplest type of entry that exist unconditionally<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>, and generally form the
+filesystem structure. Their inodes are allocated incrementally starting from 1 (the root) up to the
+magically chosen limit of 5000.</p>
+<div class="code" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>$ find . -maxdepth 2 -type d -ls
+#   inode          name
+        1   &lt;snip&gt; .
+        2   &lt;snip&gt; ./player
+       10   &lt;snip&gt; ./player/control
+       14   &lt;snip&gt; ./worlds
+       15   &lt;snip&gt; ./worlds/overworld
+       22   &lt;snip&gt; ./worlds/nether
+       29   &lt;snip&gt; ./worlds/end
+</code></pre></div>
+
+<h2 id="dynamic-entries">Dynamic entries</h2>
+<p>As the Minecraft world evolves, so must our filesystem. When a dynamic directory such as
+<code>$world/entities/by-id</code> is requested, the game is queried for a list of entities through a <strong>state
+request</strong> (covered below) and the corresponding directory structure is generated on the fly.</p>
+<div class="code" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>$ cd mnt/worlds/overworld/entities
+$ find by-id -ls
+       17    by-id
+     5000    by-id/135
+     5002    by-id/135/position
+     5018    by-id/80
+     5020    by-id/80/position
+     5023    by-id/13
+     5025    by-id/13/position
+
+# wait a bit...
+
+$ find by-id -ls
+       17    by-id
+     5000    by-id/135
+     5002    by-id/135/position
+     5028    by-id/160
+     5030    by-id/160/position
+
+# 135 still exists, 80 and 13 died, 160 is new
+</code></pre></div>
+
+<p>A dynamic directory tree is technically ephemeral, because the game state and therefore list of
+entities is constantly changing. Unfortunately this doesn't map well to a user's intuition when it
+comes to a filesystem; it should be possible to <code>cd</code> into an entity's directory and continuously poll
+its files. </p>
+<p>If every FUSE operation resulted in totally new inodes each time, we end up with a very confused
+user:</p>
+<div class="code" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>$ cd mnt/worlds/overworld/entities
+$ ls -lRi
+5561 drwxr-xr-x - dom 28 Feb 14:15 135
+
+./135:
+5563 .rwxr-xr-x 256 dom 28 Feb 14:15 position
+5565 .rwxr-xr-x 256 dom 28 Feb 14:15 type
+
+$ cd 135
+$ ls -li
+&quot;.&quot;: No such file or directory (os error 2)
+# what? we just saw the files in here. check the parent again
+
+$ ls -lRi ..
+5596 drwxr-xr-x - dom 28 Feb 14:16 135
+
+../135:
+5598 .rwxr-xr-x 256 dom 28 Feb 14:16 position
+5600 .rwxr-xr-x 256 dom 28 Feb 14:16 type
+
+# ???
+</code></pre></div>
+
+<p>Note the new inode numbers on the <code>135</code> directory. The initial <code>ls</code> shows it to be 5561, but after
+<code>cd</code>ing it's changed to something else, and the second <code>ls</code> on the parent shows it is now 5596. Chaos!</p>
+<p>What we need is a way to preserve inodes for identical entries between game states, which is done
+with a check against the current game state when building a dynamic hierarchy. If there is an
+identical child with the same name under the same parent, then we can reuse the inode. </p>
+<p>But care has to be taken for directories; it is feasible that the player entity 135 dies and is
+reused by Minecraft for an arrow entity. The existence of the <code>living</code> file within an entity
+directory represents that the entity is animate, which was true for the player but not for the
+arrow. If we blindly reuse the same inode then this stale <code>living</code> file will keep hanging around,
+falsely claiming the arrow is alive.</p>
+<p>The solution is to keep track of which directory inodes were reused, then <a href="https://github.com/DomWilliams0/minecraft-fs/blob/v1.0.0/filesystem/src/structure/registry.rs#L328-L354">cleanse them for stale
+entries</a>. </p>
+<h3 id="associated-entry-data">Associated entry data</h3>
+<p>Entries can have a tag that describes which game data they're associated with, which dictates the
+target of commands sent to the game.
+When a file or directory is queried we recurse up through its ancestors checking for these tags, and
+accumulate their "interests" in the request.</p>
+<p>For example, when reading the file below, the request is associated with the specific entity 100 in
+the overworld.</p>
+<div class="code" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>cat worlds/overworld/entities/by-id/100/position
+               |                     |     |
+               |                     |     +-----&gt; Command = EntityPosition
+               |                     |
+               |                     +-----------&gt; TargetEntity = 100
+               |
+               +---------------------------------&gt; TargetWorld = Overworld
+</code></pre></div>
+
+<h2 id="phantom-entries">Phantom entries</h2>
+<p>While entities within a world are countable and can be listed in the <code>entities/by-id</code> directory, the
+same can't be said about block coordinates. There are technically infinite blocks in a Minecraft
+world, so attempting to generate a full directory listing of every single block is infeasible.</p>
+<p>Instead, directories for blocks are generated on-demand when they are explicitly browsed to via
+<code>$world/blocks/$x,$y,$z</code>, hence the description of <strong>phantom entries</strong>. This is inspired by <a href="https://tldp.org/LDP/abs/html/devref1.html#DEVTCP">Bash's
+/dev/tcp</a> pseudo-device, where a socket can be
+opened to a host by writing to a non-existent file with path <code>/dev/tcp/$host/$port</code>.</p>
+<p>This also has the advantage that we can be more flexible with block coordinate parsing, and accept
+floating point positions as well, such as an entity's position.</p>
+<div class="code" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>$ cd mnt/worlds/overworld/blocks
+$ ls
+README
+
+$ cat README
+Path format is ./x,y,z or ./x\ y\ z
+e.g. 0,64,100 or &quot;0.5 22.3 41.5555&quot;
+
+# directory is created on demand, which contains the `type` file
+$ cat 100,64,200/type
+minecraft:dirt
+
+# access through player&#39;s floating point position
+$ cat &quot;$(cat ~/mnt/player/position)/type&quot;
+minecraft:air  
+</code></pre></div>
+
+<h1 id="architecture">Architecture</h1>
+<!-- 
+https://asciiflow.com/#/share/eJztVc1O4zAQfpWRT7sSKAgOCA5Iu2J744R6y8XEEzKqY0djp7RCiAuPgLrvwXG1T7NPwjhqRUtaaWH56WEtW3Hiz5OZ%2BTyfr5XTNapjNXSRokUDhvUVuUu1o6yeIsvSda4muTo%2BOjzaydVUZvuHBzKLOInykitI7c%2F973ftee4W%2F%2Bme5xVam5VkEXDSWM%2FIsAAsYT%2FMp12wAWoXYV3rYQsdEzhruhxnl8JB7Q2uxWJRediDk%2BUNFWobq8%2BIdR7Q7OHZh0TLmDRYuhgMz3%2FACNmhvTVMY2FGOwNtQA6NLjBhWPNULLy319vTe%2Bl6ntDXMdk%2FaJ%2FeVyu1OwxlmPv28%2B5v7cx%2BLaIbSI2HaYhYQ4jcFrFlBIMlOYrk3b9V%2FZbnT1TF%2B1HbfPn6pHyrRbcL36z1oicYgJxoSFirQGt0hVEbQyymN1k%2B0%2BSijABFRdZkjWYUhWO0OmU%2BVNSETZaTx5t9Pk30iasJmV0xRYQLrPSYfMtQehmJ9L7lDtqZ3nruXr5pHsbsoRPSgST5e1uWIpp9qfVJVIeOJmB8LQxB8MUI439FXc7jG96NK5p2Jke3YF1GKCylgnjbezhXN%2BrmEVE%2BZBM%3D)
+-->
+
+<div class="code" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code> ┌──────────────────────────────┐
+ │     Shell/file explorer      │
+ ├──────────────────────────────┤
+ │ - ls mnt                     │
+ │ - cat mnt/player/gamemode    │
+ │ - echo 0 &gt; mnt/player/health │
+ └──────────────────────────────┘
+       ▲
+       │  via lib FUSE kernel driver and userspace library
+───────┼──────────────────────────────────────────────────────────────────
+       │
+       ▼
+ ┌─────────────┐               ┌──────────────────────────────────────────┐
+ │   FUSE fs   │◄─────────────►│     Filesystem structure definition      │
+ ├─────────────┤               ├──────────────────────────────────────────┤
+ │ - lookup()  │               │ - Allocates inodes                       │
+ │ - readdir() │               │ - Maintains child/parent relationships   │
+ │ - read()    │               │ - Defines read/write behaviour for files │
+ │ - write()   │               └──────────────────────────────────────────┘
+ └─────────────┘
+       ▲ via FlatBuffers
+       │ over Unix domain socket
+───────┼──────────────────────────────────────────────────────────────────
+       │
+       ▼
+ ┌───────────────────────────┐
+ │  Modded Minecraft client  │
+ └───────────────────────────┘
+</code></pre></div>
+
+<p>Communication between the FUSE filesystem and the Minecraft mod is a pretty simple synchronous
+reply/response protocol using <a href="https://google.github.io/flatbuffers/">FlatBuffers</a> (defined
+<a href="https://github.com/DomWilliams0/minecraft-fs/blob/develop/shared/">here</a>) over the Unix
+domain socket <code>/tmp/minecraft-fuse-$USER</code>. </p>
+<p>There are 2 primary message types in the FlatBuffers protocol - <strong>state</strong> and <strong>command</strong>.
+State requests are issued implicitly during the browsing of the filesystem, and fetch relevant game
+data to build the directory structure.</p>
+<p>Let's take an <code>ls</code> in the <code>$world/entities/by-id</code> directory
+as an example. The FUSE function <code>readdir</code> is invoked on the <code>by-id</code> directory inode, which
+has registered an interest in the list of entities in the world via associated entry data (as
+mentioned above). Before we can list any child directories we need to know which entity IDs to list,
+so a synchronous state request is fired off to the game, and its response is used to populate the
+directory.</p>
+<aside>
+<p>Even a simple file access can trigger a cascade of <code>lookup</code>s and <code>getattr</code>s on all intermediary
+directories, and the cost of state requests can add up if we need to wait for a dozen round-trips
+(possibly including expensive spatial queries in the Minecraft world) before listing a directory.</p>
+<p>For now there is a 500ms cache time for the game state, which should be high enough to avoid
+tons of redundant requests and low enough that it won't be too stale when used.</p>
+<p>There's always the chance that an entity listed as alive dies the millisecond after a state request,
+causing head-scratching IO errors when it's accessed, but that's a trade-off I'm willing to accept.
+At least the errors are gracefully handled and bubbled up from FUSE.</p>
+</aside>
+<p>The other message type is a command, which is issued on a file read/write to query/update the game
+world. The file entries in the filesystem are aware of the data type they expect (float, integer, 3D
+vector, etc) and can validate the input locally before sending it to the game.</p>
+<h1 id="a-use-case">A use case?</h1>
+<p>To be honest, legitimate use cases did not feature heavily, if at all, when planning this project.
+The main reason is that it seemed a pretty cool way to learn about implementing virtual filesystems
+with FUSE.</p>
+<p>But during development, I discovered an actual useful purpose - a language-agnostic modding API! Any
+language with I/O can use the filesystem to mod Minecraft without needing to deal with the horrors
+of gradle. I made a start on a very basic <a href="https://github.com/DomWilliams0/minecraft-fs/blob/v1.0.0/scripts/common.py">Python
+API</a>, and it really is
+very satisfying use a REPL to mess around with the game.</p>
+<video controls muted playsinline>
+    <source src="https://domwilliams0.github.io/images/mcfs-repl.mp4" type="video/mp4" />
+    There would be a video here but your browser doesn't support it
+</video>
+
+<!--
+### Inode reuse
+
+What we need is a way to preserve inodes for identical entries between game states. This is a good
+point to show how entries are actually defined in code, so we can see why comparing them for
+equality is a pain.
+
+
+
+<div class="code" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #8f5902; font-style: italic">// entities_dir is a $world/entities directory.</span>
+<span style="color: #8f5902; font-style: italic">// create dynamic &quot;by-id&quot; dir under it</span>
+<span style="color: #000000">builder</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">add_entry</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #f8f8f8"></span>
+<span style="color: #f8f8f8">    </span><span style="color: #000000">entities_dir</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8"></span>
+<span style="color: #f8f8f8">    </span><span style="color: #4e9a06">&quot;by-id&quot;</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8"></span>
+<span style="color: #f8f8f8">    </span><span style="color: #000000">DirEntry</span>::<span style="color: #000000">build</span><span style="color: #000000; font-weight: bold">()</span><span style="color: #f8f8f8"></span>
+<span style="color: #f8f8f8">        </span><span style="color: #8f5902; font-style: italic">// declares that this dir requires a list of entitys and their IDs from the</span>
+<span style="color: #f8f8f8">        </span><span style="color: #8f5902; font-style: italic">// game, and provides a function to generate the structure</span>
+<span style="color: #f8f8f8">        </span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">dynamic</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">DynamicStateType</span>::<span style="color: #000000">EntityIds</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8"> </span><span style="color: #ce5c00; font-weight: bold">|</span><span style="color: #000000">game_state</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8"> </span><span style="color: #000000">reg</span><span style="color: #ce5c00; font-weight: bold">|</span><span style="color: #f8f8f8"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8"></span>
+<span style="color: #f8f8f8">            </span><span style="color: #204a87; font-weight: bold">for</span><span style="color: #f8f8f8"> </span><span style="color: #000000">entity_details</span><span style="color: #f8f8f8"> </span><span style="color: #204a87; font-weight: bold">in</span><span style="color: #f8f8f8"> </span><span style="color: #ce5c00; font-weight: bold">&amp;</span><span style="color: #000000">game_state</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">entities</span><span style="color: #f8f8f8"> </span><span style="color: #000000; font-weight: bold">{</span><span style="color: #f8f8f8"></span>
+<span style="color: #f8f8f8">                </span><span style="color: #8f5902; font-style: italic">// create a dir for every entity reported by the game</span>
+<span style="color: #f8f8f8">                </span><span style="color: #204a87; font-weight: bold">let</span><span style="color: #f8f8f8"> </span><span style="color: #000000">id</span><span style="color: #f8f8f8"> </span><span style="color: #ce5c00; font-weight: bold">=</span><span style="color: #f8f8f8"> </span><span style="color: #000000">entity_details</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">id</span><span style="color: #000000; font-weight: bold">();</span><span style="color: #f8f8f8"></span>
+<span style="color: #f8f8f8">                </span><span style="color: #204a87; font-weight: bold">let</span><span style="color: #f8f8f8"> </span><span style="color: #000000">entity_dir</span><span style="color: #f8f8f8"> </span><span style="color: #ce5c00; font-weight: bold">=</span><span style="color: #f8f8f8"> </span><span style="color: #000000">reg</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">add_root_entry</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #f8f8f8"></span>
+<span style="color: #f8f8f8">                    </span><span style="color: #000000">id</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">to_string</span><span style="color: #000000; font-weight: bold">(),</span><span style="color: #f8f8f8"> </span><span style="color: #8f5902; font-style: italic">// entity directory name</span>
+<span style="color: #f8f8f8">                    </span><span style="color: #000000">DirEntry</span>::<span style="color: #000000">build</span><span style="color: #000000; font-weight: bold">()</span><span style="color: #f8f8f8"></span>
+<span style="color: #f8f8f8">                        </span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">associated_data</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">EntryAssociatedData</span>::<span style="color: #000000">EntityId</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">id</span><span style="color: #000000; font-weight: bold">))</span><span style="color: #f8f8f8"></span>
+<span style="color: #f8f8f8">                        </span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">finish</span><span style="color: #000000; font-weight: bold">(),</span><span style="color: #f8f8f8"></span>
+<span style="color: #f8f8f8">                </span><span style="color: #000000; font-weight: bold">);</span><span style="color: #f8f8f8"></span>
+
+<span style="color: #f8f8f8">                </span><span style="color: #8f5902; font-style: italic">// add files for entity position, health, type, etc</span>
+<span style="color: #f8f8f8">                </span><span style="color: #000000">reg</span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">add_entry</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #f8f8f8"></span>
+<span style="color: #f8f8f8">                       </span><span style="color: #000000">entity_dir</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8"></span>
+<span style="color: #f8f8f8">                       </span><span style="color: #4e9a06">&quot;position&quot;</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8"></span>
+<span style="color: #f8f8f8">                       </span><span style="color: #000000">FileEntry</span>::<span style="color: #000000">build</span><span style="color: #000000; font-weight: bold">()</span><span style="color: #f8f8f8"></span>
+<span style="color: #f8f8f8">                           </span><span style="color: #8f5902; font-style: italic">// describes if the file is readable and/or writeable, which</span>
+<span style="color: #f8f8f8">                           </span><span style="color: #8f5902; font-style: italic">// game command this corresponds to, and the data type (in this</span>
+<span style="color: #f8f8f8">                           </span><span style="color: #8f5902; font-style: italic">// case an (x,y,z) position</span>
+<span style="color: #f8f8f8">                           </span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">behaviour</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">ReadWrite</span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">CommandType</span>::<span style="color: #000000">EntityPosition</span><span style="color: #000000; font-weight: bold">,</span><span style="color: #f8f8f8"> </span><span style="color: #000000">Position</span><span style="color: #000000; font-weight: bold">))</span><span style="color: #f8f8f8"></span>
+<span style="color: #f8f8f8">                           </span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">finish</span><span style="color: #000000; font-weight: bold">(),</span><span style="color: #f8f8f8"></span>
+<span style="color: #f8f8f8">                </span><span style="color: #000000; font-weight: bold">);</span><span style="color: #f8f8f8"></span>
+
+<span style="color: #f8f8f8">                </span><span style="color: #8f5902; font-style: italic">// ...</span>
+<span style="color: #f8f8f8">            </span><span style="color: #000000; font-weight: bold">}</span><span style="color: #f8f8f8"></span>
+<span style="color: #f8f8f8">        </span><span style="color: #000000; font-weight: bold">})</span><span style="color: #f8f8f8"></span>
+<span style="color: #f8f8f8">        </span><span style="color: #000000; font-weight: bold">.</span><span style="color: #000000">finish</span><span style="color: #000000; font-weight: bold">(),</span><span style="color: #f8f8f8"></span>
+<span style="color: #000000; font-weight: bold">);</span><span style="color: #f8f8f8"></span>
+</code></pre></div>
+
+
+
+This example of building the entity directory entries dynamically shows how 
+
+-->
+
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>I initially wanted to <a href="https://github.com/DomWilliams0/minecraft-fs/blob/751b01d1511bc52d6dad9158c584923207c2b883/filesystem/src/structure/inode.rs#L28-L47">allocate inodes in
+blocks</a>
+that could be reused with a freelist, because it felt elegant and interesting. Turns out it's really
+just extra complexity for absolutely no reason - I don't think we'll exhaust all
+18,446,744,073,709,551,615 available inodes any time soon.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>Sometimes entries are hidden from view when the player is not in a game, but this is
+  implemented with a view filter rather than releasing the inode.&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+    </article>
+</main>
+
+<footer>
+    <div class="prev-next">
+    <span><a href="/devlog7">← Devlog #7: custom async runtime</a></span>
+    <span>&nbsp;</span>
+</div>
+
+    <hr/> <br/>
+    <p>Return to <a href="/">home</a> | Subscribe to <a href="/index.xml">RSS</a> | Send me an <a href="mailto:contact@domwillia.ms">email</a> | Follow me on <a href="https://github.com/DomWilliams0">GitHub</a></p>
+</footer>
+</body>
+</html>
+
