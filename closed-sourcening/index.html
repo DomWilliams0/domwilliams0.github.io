@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Dom Williams</title>
+    <title>The Great Closed Source-ning</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Personal blog about Rust, gamedev, and other programmery joys."/>
+    <meta name="description" content="I'm making the core of my open-source project private for the time being, to remove the inertia and pressure of open source and prioritise making progress with my limited time."/>
     <meta name="author" content="Dom Williams">
-    <!--<meta name="keywords" content=""/>-->
+    <!--<meta name="keywords" content="rust, gamedev, devlog, name-needed, open-source, closed-source, gottem"/>-->
     <style type="text/css">:root{font-family:"Helvetica Neue",system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:#333;background-color:#fefefe;text-rendering:optimizeLegibility;font-size:13pt}body{max-width:38rem;padding:1rem;margin:auto}video{max-width:35rem;margin:auto;display:block}pre{padding:5px;border-radius:8px;overflow:auto}code{overflow:scroll;overflow-y:auto;overflow-x:auto;font-family:monospace;font-size:smaller;-webkit-font-feature-settings:normal;-moz-font-feature-settings:normal;font-feature-settings:normal;padding:1.5px;border-radius:4px;font-weight:400;background:#ececee}pre code{background:none !important;color:#444;margin:0;padding:0;line-height:1.1em}article{line-height:1.3rem;display:block;padding-top:.5rem}blockquote{border-left:2px solid;margin:40px 15px;padding:10px;font-style:italic}@media(max-width:683px){blockquote{margin:10px;padding:10px}}blockquote:before{content:"”";font-family:Georgia,serif;font-size:3.875rem;position:absolute;left:-40px;top:-20px}blockquote p:first-of-type{margin-top:0}blockquote p:last-of-type{margin-bottom:0}.article-date{color:#777;margin-bottom:20px}main header{margin:0}main header h1{margin-bottom:0}.article-title{font-size:2rem}.prev-next{width:100%}.next{float:right}nav#toc ul{list-style-type:disc;padding-left:10px;margin-left:10px}#toc{float:right;margin:0 1.5rem;background-color:#fafafa;padding:.5rem .5rem;border-radius:4px;line-height:1.5rem}#toc a,#toc a:visited{color:#0679a7}@media(max-width:500px){#toc{float:none;margin:auto;width:70%}.header-nav{display:block !important;float:none !important;text-align:center}}#blog-header{border-bottom:2px solid #333;margin:0 auto 5px;display:block;overflow:hidden}#blog-header h1{font-size:1.6rem}#blog-header nav{float:right}.link5eva a:visited,.link5eva a{color:var(--color)}#blog-header a{text-decoration:none;display:inline-block}#blog-header a:hover{color:#414141}.header-nav{display:inline;margin:auto;padding:.5rem 0}.icons svg{width:1rem;height:auto;padding:0 10px;color:#111}.footnote,.footnote p{font-size:.9em;font-style:italic;line-height:1.4}.footnote{font-style:normal}sup{vertical-align:super;line-height:0;font-size:.83em;padding:.1em .2em}.img_container{height:auto;display:block !important}.img_container img{display:inline-block;max-width:90%}.img_caption{text-align:left;font-size:.9em;font-style:italic}.hidden{display:none}#intro p,#intro li{font-size:.9rem}footer p{margin-top:0;font-size:.8rem;text-align:center;color:#5e5e5e}.note-aside:before{content:"Sidenote: ";font-weight:bold}.note-info{background-color:#dff0d8;border-color:#daf7cd}aside{border-width:1px;border-style:double;border-radius:10px;padding:.1rem .5rem;font-size:.9rem;background-color:#d3e9f5;border-color:#bde6fc}</style>
 </head>
 
@@ -43,98 +43,67 @@
     </div>
 </header>
 
-<div id="intro"><p>I mostly write technical blog posts about my <a href="https://github.com/DomWilliams0/name-needed">long-term passion project</a>, a homegrown Rust game engine for a Dwarf Fortress-like game. A good place to start reading about that is <a href="/devlog0">here</a>.</p>
-<p>Other projects I might write about in the future (all very much WIP):</p>
+<main>
+    <header>
+        <h1 class="article-title">The Great Closed Source-ning</h1>
+        <div class="article-date">
+            <time datetime="2022-12-18">18 Dec 2022</time>
+        </div>
+    </header>
+<aside class="note-info">
+    This post is about my long-term Rust gamedev project, <a href="https://github.com/DomWilliams0/name-needed">Name Needed</a>. Yes, it needs a name.
+</aside>
+
+    <article>
+        <nav id="toc" class="link5eva">
+            <strong>Table of Contents</strong>
+            <div class="toc">
 <ul>
-<li><a href="https://github.com/DomWilliams0/zig-jvm">zig-jvm</a> - Java Virtual Machine in Zig</li>
-<li><a href="https://github.com/DomWilliams0/DomeOS">DomeOS</a> - Toy x86_64 OS</li>
-<li><a href="https://github.com/DomWilliams0/minecraft-server-rs">minecraft-server-rs</a> - Minecraft server implementation</li>
-<li><a href="https://github.com/DomWilliams0/voxels-plus-plus">voxels-plus-plus</a> - C++ voxel world renderer</li>
-</ul></div>
-<hr/>
+<li><a href="#the-inertia-of-open-source">The inertia of open source</a></li>
+<li><a href="#project-changes">Project changes</a></li>
+</ul>
+</div>
 
-<table class="posts">
-    <tbody>
-        <tr>
-    <td nowrap class="post-date">
-        <time datetime="2022-12-18">2022-12-18</time>
-    </td>
-    <td class="post-title"><a href="/closed-sourcening" title="The Great Closed Source-ning">The Great Closed Source-ning</a></td>
-</tr>
-<tr>
-    <td nowrap class="post-date">
-        <time datetime="2022-03-05">2022-03-05</time>
-    </td>
-    <td class="post-title"><a href="/minecraft-fs" title="A FUSE filesystem for Minecraft">A FUSE filesystem for Minecraft</a></td>
-</tr>
-<tr>
-    <td nowrap class="post-date">
-        <time datetime="2022-02-15">2022-02-15</time>
-    </td>
-    <td class="post-title"><a href="/devlog7" title="Devlog #7: custom async runtime">Devlog #7: custom async runtime</a></td>
-</tr>
-<tr>
-    <td nowrap class="post-date">
-        <time datetime="2021-12-28">2021-12-28</time>
-    </td>
-    <td class="post-title"><a href="/devlog6" title="Devlog #6: async activities">Devlog #6: async activities</a></td>
-</tr>
-<tr>
-    <td nowrap class="post-date">
-        <time datetime="2021-05-21">2021-05-21</time>
-    </td>
-    <td class="post-title"><a href="/devlog5" title="Devlog #5: voxel world goals">Devlog #5: voxel world goals</a></td>
-</tr>
-<tr>
-    <td nowrap class="post-date">
-        <time datetime="2021-02-09">2021-02-09</time>
-    </td>
-    <td class="post-title"><a href="/panik" title="Application-wide panic handling">Application-wide panic handling</a></td>
-</tr>
-<tr>
-    <td nowrap class="post-date">
-        <time datetime="2020-11-21">2020-11-21</time>
-    </td>
-    <td class="post-title"><a href="/devlog4" title="Devlog #4: entity activities">Devlog #4: entity activities</a></td>
-</tr>
-<tr>
-    <td nowrap class="post-date">
-        <time datetime="2020-08-28">2020-08-28</time>
-    </td>
-    <td class="post-title"><a href="/devlog3" title="Devlog #3: entity movement">Devlog #3: entity movement</a></td>
-</tr>
-<tr>
-    <td nowrap class="post-date">
-        <time datetime="2020-07-10">2020-07-10</time>
-    </td>
-    <td class="post-title"><a href="/devlog2" title="Devlog #2: game engine architecture">Devlog #2: game engine architecture</a></td>
-</tr>
-<tr>
-    <td nowrap class="post-date">
-        <time datetime="2020-06-09">2020-06-09</time>
-    </td>
-    <td class="post-title"><a href="/devlog1" title="Devlog #1: fixed timestep">Devlog #1: fixed timestep</a></td>
-</tr>
-<tr>
-    <td nowrap class="post-date">
-        <time datetime="2020-06-04">2020-06-04</time>
-    </td>
-    <td class="post-title"><a href="/devlog0" title="Devlog #0: vision and goals">Devlog #0: vision and goals</a></td>
-</tr>
-<tr>
-    <td nowrap class="post-date">
-        <time datetime="2020-06-01">2020-06-01</time>
-    </td>
-    <td class="post-title"><a href="/todos" title="The Bane of TODOs">The Bane of TODOs</a></td>
-</tr>
+        </nav>
 
-    </tbody>
-</table>
+        <p>If you've followed this project at all, you might have marvelled at the infinite free time and energy I
+had available to pour into it. Especially the excited first <a href="/devlog0">devlog</a> outlining
+my ambitious plans for a game and game engine from the ground up. </p>
+<p>In short, I no longer have as much time and resources to put into this project as I once did, and in order to
+keep it going, I'm making some big changes to how I work on it. Predominantly, I am moving the bulk of the
+project to closed-source for the time being.</p>
+<h1 id="the-inertia-of-open-source">The inertia of open source</h1>
+<p>It's exciting to publish work you're proud of to GitHub, showing it off as your portfolio. But I've found that this comes with a downside -
+the pressure to always have the code in a good state, to never push a broken commit or temporary
+logging like <code>[INFO ] LALA entity is here $x $y $z</code>.</p>
+<p>I've found this adds inertia and friction which ultimately kills progress for side projects, because if you only have 1 hour to work on your game after your day job, do you really want to spend that time fixing logging, or the Windows CI build? I'd rather add a fun feature like injured limbs affecting walking speed, so the end result is just doing something else instead.</p>
+<p>I used to have way more time such that fixing the CI was a minor if a bit annoying side quest, but
+nowadays it's more of a total motivation killer.</p>
+<h1 id="project-changes">Project changes</h1>
+<p>So I'm making the core of the project private for now, so I feel more free to hack away at it and
+actually make progress towards finishing it. This mainly comprises the <code>simulation</code>, <code>procgen</code> and
+<code>renderer</code> crates, but there are a few other crates that are standalone and will remain open source,
+including:</p>
+<ul>
+<li><code>ai</code>, an implementation of an <code>Infinite Axis Utility System</code> (IAUS)</li>
+<li><code>world</code>, the 3D voxel world</li>
+</ul>
+<p>I plan to write technical posts about these two and eventually release them on crates.io. </p>
+<p>Repository-wise, I'm going to keep the public crates in the <a href="https://github.com/DomWilliams0/name-needed"><code>name-needed</code></a> repository and put an
+archive of the full project in its current state in a <a href="https://github.com/DomWilliams0/name-needed-archive">separate repo</a>, because I'm too much of a whore for GitHub stars to leave 95 of them to stagnate on an archived repo.</p>
+<p>I also plan to start posting shorter, more regular and less technical devlogs that show progress,
+the first of which will show a pretty dramatic change in the rendering style.</p>
+    </article>
+</main>
 
 <footer>
-    
+    <div class="prev-next">
+    <span><a href="/minecraft-fs">← A FUSE filesystem for Minecraft</a></span>
+    <span>&nbsp;</span>
+</div>
+
     <hr/> <br/>
-    
+    <p>Return to <a href="/">home</a> | Subscribe to <a href="/index.xml">RSS</a> | Send me an <a href="mailto:contact@domwillia.ms">email</a> | Follow me on <a href="https://github.com/DomWilliams0">GitHub</a></p>
 </footer>
 </body>
 </html>
