@@ -8,7 +8,7 @@
     <meta name="description" content="I'm making the core of my open-source project private for the time being, to remove the inertia and pressure of open source and prioritise making progress with my limited time."/>
     <meta name="author" content="Dom Williams">
     <!--<meta name="keywords" content="rust, gamedev, devlog, name-needed, open-source, closed-source, gottem"/>-->
-    <style type="text/css">:root{font-family:"Helvetica Neue",system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:#333;background-color:#fefefe;text-rendering:optimizeLegibility;font-size:13pt}body{max-width:38rem;padding:1rem;margin:auto}video{max-width:35rem;margin:auto;display:block}pre{padding:5px;border-radius:8px;overflow:auto}code{overflow:scroll;overflow-y:auto;overflow-x:auto;font-family:monospace;font-size:smaller;-webkit-font-feature-settings:normal;-moz-font-feature-settings:normal;font-feature-settings:normal;padding:1.5px;border-radius:4px;font-weight:400;background:#ececee}pre code{background:none !important;color:#444;margin:0;padding:0;line-height:1.1em}article{line-height:1.3rem;display:block;padding-top:.5rem}blockquote{border-left:2px solid;margin:40px 15px;padding:10px;font-style:italic}@media(max-width:683px){blockquote{margin:10px;padding:10px}}blockquote:before{content:"”";font-family:Georgia,serif;font-size:3.875rem;position:absolute;left:-40px;top:-20px}blockquote p:first-of-type{margin-top:0}blockquote p:last-of-type{margin-bottom:0}.article-date{color:#777;margin-bottom:20px}main header{margin:0}main header h1{margin-bottom:0}.article-title{font-size:2rem}.prev-next{width:100%}.next{float:right}nav#toc ul{list-style-type:disc;padding-left:10px;margin-left:10px}#toc{float:right;margin:0 1.5rem;background-color:#fafafa;padding:.5rem .5rem;border-radius:4px;line-height:1.5rem}#toc a,#toc a:visited{color:#0679a7}@media(max-width:500px){#toc{float:none;margin:auto;width:70%}.header-nav{display:block !important;float:none !important;text-align:center}}#blog-header{border-bottom:2px solid #333;margin:0 auto 5px;display:block;overflow:hidden}#blog-header h1{font-size:1.6rem}#blog-header nav{float:right}.link5eva a:visited,.link5eva a{color:var(--color)}#blog-header a{text-decoration:none;display:inline-block}#blog-header a:hover{color:#414141}.header-nav{display:inline;margin:auto;padding:.5rem 0}.icons svg{width:1rem;height:auto;padding:0 10px;color:#111}.footnote,.footnote p{font-size:.9em;font-style:italic;line-height:1.4}.footnote{font-style:normal}sup{vertical-align:super;line-height:0;font-size:.83em;padding:.1em .2em}.img_container{height:auto;display:block !important}.img_container img{display:inline-block;max-width:90%}.img_caption{text-align:left;font-size:.9em;font-style:italic}.hidden{display:none}#intro p,#intro li{font-size:.9rem}footer p{margin-top:0;font-size:.8rem;text-align:center;color:#5e5e5e}.note-aside:before{content:"Sidenote: ";font-weight:bold}.note-info{background-color:#dff0d8;border-color:#daf7cd}aside{border-width:1px;border-style:double;border-radius:10px;padding:.1rem .5rem;font-size:.9rem;background-color:#d3e9f5;border-color:#bde6fc}</style>
+    <style type="text/css">:root{font-family:"Helvetica Neue",system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:#333;background-color:#fefefe;text-rendering:optimizeLegibility;font-size:13pt}body{max-width:38rem;padding:1rem;margin:auto}video{max-width:100%;margin:auto;display:block}pre{padding:5px;border-radius:8px;overflow:auto}code{overflow:scroll;overflow-y:auto;overflow-x:auto;font-family:monospace;font-size:smaller;-webkit-font-feature-settings:normal;-moz-font-feature-settings:normal;font-feature-settings:normal;padding:1.5px;border-radius:4px;font-weight:400;background:#ececee}pre code{background:none !important;color:#444;margin:0;padding:0;line-height:1.1em}article{line-height:1.3rem;display:block;padding-top:.5rem}blockquote{border-left:2px solid;margin:40px 15px;padding:10px;font-style:italic}@media(max-width:683px){blockquote{margin:10px;padding:10px}}blockquote:before{content:"”";font-family:Georgia,serif;font-size:3.875rem;position:absolute;left:-40px;top:-20px}blockquote p:first-of-type{margin-top:0}blockquote p:last-of-type{margin-bottom:0}.article-date{color:#777;margin-bottom:20px}main header{margin:0}main header h1{margin-bottom:0}.article-title{font-size:2rem}.prev-next{width:100%}.next{float:right}nav#toc ul{list-style-type:disc;padding-left:10px;margin-left:10px}#toc{float:right;margin:0 1.5rem;background-color:#fafafa;padding:.5rem .5rem;border-radius:4px;line-height:1.5rem}#toc a,#toc a:visited{color:#0679a7}@media(max-width:500px){#toc{float:none;margin:auto;width:70%}.header-nav{display:block !important;float:none !important;text-align:center}}#blog-header{border-bottom:2px solid #333;margin:0 auto 5px;display:block;overflow:hidden}#blog-header h1{font-size:1.6rem}#blog-header nav{float:right}.link5eva a:visited,.link5eva a{color:var(--color)}#blog-header a{text-decoration:none;display:inline-block}#blog-header a:hover{color:#414141}.header-nav{display:inline;margin:auto;padding:.5rem 0}.icons svg{width:1rem;height:auto;padding:0 10px;color:#111}.footnote,.footnote p{font-size:.9em;font-style:italic;line-height:1.4}.footnote{font-style:normal}sup{vertical-align:super;line-height:0;font-size:.83em;padding:.1em .2em}.img_container{height:auto;display:block !important}.img_container img{display:inline-block;max-width:90%}img{max-width:100%}.img_caption{text-align:left;font-size:.9em;font-style:italic;display:block;text-align:center}.hidden{display:none}#intro p,#intro li{font-size:.9rem}footer p{margin-top:0;font-size:.8rem;text-align:center;color:#5e5e5e}.note-aside:before{content:"Sidenote: ";font-weight:bold}.note-info{background-color:#dff0d8;border-color:#daf7cd}aside{border-width:1px;border-style:double;border-radius:10px;padding:.1rem .5rem;font-size:.9rem;background-color:#d3e9f5;border-color:#bde6fc}</style>
 </head>
 
 <body>
@@ -92,14 +92,64 @@ including:</p>
 <p>Repository-wise, I'm going to keep the public crates in the <a href="https://github.com/DomWilliams0/name-needed"><code>name-needed</code></a> repository and put an
 archive of the full project in its current state in a <a href="https://github.com/DomWilliams0/name-needed-archive">separate repo</a>, because I'm too much of a whore for GitHub stars to leave 95 of them to stagnate on an archived repo.</p>
 <p>I also plan to start posting shorter, more regular and less technical devlogs that show progress,
-the first of which will show a pretty dramatic change in the rendering style.</p>
+the <a href="/devlog8">first of which</a> will show a pretty dramatic change in the rendering style.</p>
     </article>
+
+    <script>
+        // This code was brought to you by the one and only Assistant
+        // Let's hope you know what you're doing, because I have no clue
+        //
+        //
+        //            _
+        //           /(|
+        //          (  :
+        //         __\  \  _____
+        //       (____)  `|
+        //      (____)|   |
+        //       (____).__|
+        //        (___)__.|_____
+
+        function isInViewport(element) {
+            var rect = element.getBoundingClientRect();
+            return (
+                rect.top < Math.max(window.innerHeight, document.documentElement.clientHeight) &&
+                rect.bottom > 0 &&
+                rect.left < Math.max(window.innerWidth, document.documentElement.clientWidth) &&
+                rect.right > 0
+            );
+        }
+
+        function isFullyOutOfViewport(element) {
+            var rect = element.getBoundingClientRect();
+            return (
+                rect.top >= Math.max(window.innerHeight, document.documentElement.clientHeight) ||
+                rect.bottom <= 0 ||
+                rect.left >= Math.max(window.innerWidth, document.documentElement.clientWidth) ||
+                rect.right <= 0
+            );
+        }
+
+        var videos = document.querySelectorAll("video");
+
+        let playVisibleVideos = function() {
+            for (var i = 0; i < videos.length; i++) {
+                if (isInViewport(videos[i])) {
+                    videos[i].play();
+                } else if (isFullyOutOfViewport(videos[i])) {
+                    videos[i].pause();
+                }
+            }
+        };
+        window.addEventListener("scroll", playVisibleVideos);
+        window.addEventListener("load", playVisibleVideos);
+
+    </script>
 </main>
 
 <footer>
     <div class="prev-next">
     <span><a href="/minecraft-fs">← A FUSE filesystem for Minecraft</a></span>
-    <span>&nbsp;</span>
+    <span class="next"><a href="/devlog8">Devlog #8: 2D to 3D →</a></span>
 </div>
 
     <hr/> <br/>
