@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Devlog #8: 2D to 3D</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Adding an extra dimension with the power of quaternions, orthographic projections and a whole lot of churn."/>
+    <meta name="author" content="Dom Williams">
+    <!--<meta name="keywords" content="rust, gamedev, devlog, name-needed, game-engine, orthographic, projection, 3D, 2D"/>-->
+    <style type="text/css">:root{font-family:"Helvetica Neue",system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:#333;background-color:#fefefe;text-rendering:optimizeLegibility;font-size:13pt}body{max-width:38rem;padding:1rem;margin:auto}video{max-width:100%;margin:auto;display:block}pre{padding:5px;border-radius:8px;overflow:auto}code{overflow:scroll;overflow-y:auto;overflow-x:auto;font-family:monospace;font-size:smaller;-webkit-font-feature-settings:normal;-moz-font-feature-settings:normal;font-feature-settings:normal;padding:1.5px;border-radius:4px;font-weight:400;background:#ececee}pre code{background:none !important;color:#444;margin:0;padding:0;line-height:1.1em}article{line-height:1.3rem;display:block;padding-top:.5rem}blockquote{border-left:2px solid;margin:40px 15px;padding:10px;font-style:italic}@media(max-width:683px){blockquote{margin:10px;padding:10px}}blockquote:before{content:"”";font-family:Georgia,serif;font-size:3.875rem;position:absolute;left:-40px;top:-20px}blockquote p:first-of-type{margin-top:0}blockquote p:last-of-type{margin-bottom:0}.article-date{color:#777;margin-bottom:20px}main header{margin:0}main header h1{margin-bottom:0}.article-title{font-size:2rem}.prev-next{width:100%}.next{float:right}nav#toc ul{list-style-type:disc;padding-left:10px;margin-left:10px}#toc{float:right;margin:0 1.5rem;background-color:#fafafa;padding:.5rem .5rem;border-radius:4px;line-height:1.5rem}#toc a,#toc a:visited{color:#0679a7}@media(max-width:500px){#toc{float:none;margin:auto;width:70%}.header-nav{display:block !important;float:none !important;text-align:center}}#blog-header{border-bottom:2px solid #333;margin:0 auto 5px;display:block;overflow:hidden}#blog-header h1{font-size:1.6rem}#blog-header nav{float:right}.link5eva a:visited,.link5eva a{color:var(--color)}#blog-header a{text-decoration:none;display:inline-block}#blog-header a:hover{color:#414141}.header-nav{display:inline;margin:auto;padding:.5rem 0}.icons svg{width:1rem;height:auto;padding:0 10px;color:#111}.footnote,.footnote p{font-size:.9em;font-style:italic;line-height:1.4}.footnote{font-style:normal}sup{vertical-align:super;line-height:0;font-size:.83em;padding:.1em .2em}.img_container{height:auto;display:block !important}.img_container img{display:inline-block;max-width:90%}img{max-width:100%}.img_caption{text-align:left;font-size:.9em;font-style:italic;display:block;text-align:center}.hidden{display:none}#intro p,#intro li{font-size:.9rem}footer p{margin-top:0;font-size:.8rem;text-align:center;color:#5e5e5e}.note-aside:before{content:"Sidenote: ";font-weight:bold}.note-info{background-color:#dff0d8;border-color:#daf7cd}aside{border-width:1px;border-style:double;border-radius:10px;padding:.1rem .5rem;font-size:.9rem;background-color:#d3e9f5;border-color:#bde6fc}</style>
+</head>
+
+<body>
+<header id="blog-header">
+    <div class="link5eva">
+        <h1 class="notalink header-nav"><a href="/" title="Return to root">Dom Williams</a></h1>
+        <nav class="icons header-nav">
+            <a href="/index.xml" title="RSS feed">
+                <span class="hidden">RSS</span>
+                <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>RSS</title>
+                    <path d="M19.199 24C19.199 13.467 10.533 4.8 0 4.8V0c13.165 0 24 10.835 24 24h-4.801zM3.291 17.415c1.814 0 3.293 1.479 3.293 3.295 0 1.813-1.485 3.29-3.301 3.29C1.47 24 0 22.526 0 20.71s1.475-3.294 3.291-3.295zM15.909 24h-4.665c0-6.169-5.075-11.245-11.244-11.245V8.09c8.727 0 15.909 7.184 15.909 15.91z"/>
+                </svg>
+            </a>
+            <a href="https://github.com/DomWilliams0" title="GitHub">
+                <span class="hidden">GitHub</span>
+                <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>GitHub</title>
+                    <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+                </svg>
+            </a>
+            <a href="mailto:contact@domwillia.ms" title="Contact Me">
+                <span class="hidden">Email</span>
+                <!-- icon from Font Awesome: https://fontawesome.com/license-->
+                <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="envelope"
+                     class="svg-inline--fa fa-envelope fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg"
+                     viewBox="0 0 512 512">
+                    <path fill="currentColor"
+                          d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+                </svg>
+
+            </a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <header>
+        <h1 class="article-title">Devlog #8: 2D to 3D</h1>
+        <div class="article-date">
+            <time datetime="2023-01-07">07 Jan 2023</time>
+        </div>
+    </header>
+<aside class="note-info">
+    This post is about my long-term Rust gamedev project, <a href="https://github.com/DomWilliams0/name-needed">Name Needed</a>. Yes, it needs a name.
+</aside>
+
+    <article>
+        <nav id="toc" class="link5eva">
+            <strong>Table of Contents</strong>
+            <div class="toc">
+<ul>
+<li><a href="#top-down-to-orthographic">Top down to orthographic</a></li>
+<li><a href="#block-selection">Block selection</a></li>
+<li><a href="#entities">Entities</a><ul>
+<li><a href="#inanimate-f-ing-objects">Inanimate f&amp;!*ing objects</a></li>
+</ul>
+</li>
+<li><a href="#job-indicators">Job indicators</a></li>
+<li><a href="#summary">Summary</a></li>
+</ul>
+</div>
+
+        </nav>
+
+        <p>I recently made a significant change of direction to my game by switching the rendering style from a flat 2D top-down view to a 3D orthographic view. The hope is that this will
+help make it more intuitive to understand what is going on, as the underlying game is 3D anyway.</p>
+<p>This post will look at some of the pain points I encountered while porting to 3D.</p>
+<h1 id="top-down-to-orthographic">Top down to orthographic</h1>
+<p>Here's the old top down view of a forest, with some browsing horizontally and vertically around the
+tree tops:</p>
+<video autoplay loop muted playsinline>
+    <source src="https://domwilliams0.github.io/images/devlog8/2d-camera.mp4" type="video/mp4">
+    <p>Your browser doesn't support this embedded video.</p>
+</video>
+
+<p>And now enhanced with an extra dimension:</p>
+<video autoplay loop muted playsinline>
+    <source src="https://domwilliams0.github.io/images/devlog8/3d-camera.mp4" type="video/mp4">
+    <p>Your browser doesn't support this embedded video.</p>
+</video>
+
+<p>It's still a very simple world with "shrubs", "tall grass" and "trees", but I think it looks pretty
+good in 3D, especially with the smooth rotation. Ideally this should make it more intuitive to
+understand what is going on in the world by having multiple perspectives, instead of just from
+above.</p>
+<p>The vertical slice view is still the same, where the up and down arrow keys move the view vertically
+1 block slice at a time. </p>
+<h1 id="block-selection">Block selection</h1>
+<video autoplay loop muted playsinline>
+    <source src="https://domwilliams0.github.io/images/devlog8/2d-selection.mp4" type="video/mp4">
+    <p>Your browser doesn't support this embedded video.</p>
+</video>
+
+<p>Selecting blocks in the world was simple when it was top down, because it was just a 2D rectangle to
+render. There was also this little nibble in the bottom right corner that encourages right clicking,
+which opens the context menu.</p>
+<p>But it's not fully clear which blocks are selected and to which depth, unless you want to read the
+verbose debug menu output. This would greatly benefit from being 3D; here is how the initial version
+looked:</p>
+<video autoplay loop muted playsinline>
+    <source src="https://domwilliams0.github.io/images/devlog8/3d-selection-unclear.mp4" type="video/mp4">
+    <p>Your browser doesn't support this embedded video.</p>
+</video>
+
+<p>It's <em>kind of</em> clear but still vague which blocks are selected, and it sometimes requires a 360 spin
+to be sure, which isn't great.</p>
+<p>I had the idea of highlighting the faces of selected blocks, which has a remarkable impact (please
+ignore the grid-like borders, there is still some work left to propagate block face occlusions
+across chunks):</p>
+<figure>
+    <video autoplay loop muted playsinline>
+        <source src="https://domwilliams0.github.io/images/devlog8/3d-selection.mp4" type="video/mp4">
+        <p>Your browser doesn't support this embedded video.</p>
+    </video>
+    <figcaption class="img_caption"></figcaption>
+</figure>
+
+<p>This shows another problem that I didn't have in a 2D top-down world - jittery screen to world space
+projection. It used to be trivial to convert between screen and world space, but now it's an imperfect
+grid-based raycast from the camera to the world. This is just the first iteration, but there is a definite need to smooth this out in the future.</p>
+<h1 id="entities">Entities</h1>
+<p>It was so simple back in the good old days when entities were just flat 2D shapes. They still had 3D
+bodies in the simulation but there was no need to worry about that for rendering.</p>
+<p>But that programmer art is no longer so simple in 3D. I considered keeping them as 2D blobs that
+always face the camera (known as "billboarding"), but I'm not sure this really fits the perspective.</p>
+<figure>
+    <video autoplay loop muted playsinline>
+        <source src="https://domwilliams0.github.io/images/devlog8/3d-billboard.mp4" type="video/mp4">
+        <p>Your browser doesn't support this embedded video.</p>
+    </video>
+    <figcaption class="img_caption"><figcaption>Don't mind Joela shooting up that tree, I swear it was intentional and definitely not a bug</figcaption></figcaption>
+</figure>
+
+<p>On the other hand, if they become 3D programmer art they <a href="/devlog3/#the-dark-times-physics">revert to big lumbering cuboids</a>. Eventually I will need to make them more people-like and less like oddly coloured geometric shapes, but that can wait.</p>
+<figure>
+    <video autoplay loop muted playsinline>
+        <source src="https://domwilliams0.github.io/images/devlog8/3d-walking.mp4" type="video/mp4">
+        <p>Your browser doesn't support this embedded video.</p>
+    </video>
+    <figcaption class="img_caption"></figcaption>
+</figure>
+
+<h2 id="inanimate-f-ing-objects">Inanimate f&amp;!*ing objects</h2>
+<p><center>
+<img alt="" src="https://y.yarn.co/98926432-9735-4b30-9da1-35776fe7f99d_text.gif" />
+</center></p>
+<p>I might be able to make use of both styles, whereby some entity types can remain as flat 2D shapes.
+For example, background things like "tall grass" (green circles) and "shrubs" (differently sized green circles)
+could be flat whereas objects like "apples" could be 3D - have a look, and please excuse the corners
+on the apples:</p>
+<figure>
+    <video autoplay loop muted playsinline>
+        <source src="https://domwilliams0.github.io/images/devlog8/3d-apples.mp4" type="video/mp4">
+        <p>Your browser doesn't support this embedded video.</p>
+    </video>
+    <figcaption class="img_caption"></figcaption>
+</figure>
+
+<h1 id="job-indicators">Job indicators</h1>
+<p>This is an area that definitely needs some work. Currently a little floating square appears to show information about an outstanding build job. Build jobs are only for a single block, so building a wall will layer multiple instances on top of one another.</p>
+<p>This didn't really work properly in 2D, and it certainly doesn't in 3D either:</p>
+<p><img alt="Build job comparison" src="https://domwilliams0.github.io/images/devlog8/build.png" /></p>
+<p>The billboard effect doesn't really work in 3D, as it's not clear which block each job represents.
+At some point I will have to redo these to bundle up multiple block builds into a single "job" that
+clearly shows which blocks it affects.</p>
+<h1 id="summary">Summary</h1>
+<p>This change to 3D was a big effort, and involved a lot more maths and quaternions that I was
+prepared for. I think it is an improvement to the old style, but I will need to put some serious
+thought into the UI to end up with an intuitive game.</p>
+<p>But first it needs to be a game and not just a demo :^)</p>
+    </article>
+
+    <script>
+        // This code was brought to you by the one and only Assistant
+        // Let's hope you know what you're doing, because I have no clue
+        //
+        //
+        //            _
+        //           /(|
+        //          (  :
+        //         __\  \  _____
+        //       (____)  `|
+        //      (____)|   |
+        //       (____).__|
+        //        (___)__.|_____
+
+        function isInViewport(element) {
+            var rect = element.getBoundingClientRect();
+            return (
+                rect.top < Math.max(window.innerHeight, document.documentElement.clientHeight) &&
+                rect.bottom > 0 &&
+                rect.left < Math.max(window.innerWidth, document.documentElement.clientWidth) &&
+                rect.right > 0
+            );
+        }
+
+        function isFullyOutOfViewport(element) {
+            var rect = element.getBoundingClientRect();
+            return (
+                rect.top >= Math.max(window.innerHeight, document.documentElement.clientHeight) ||
+                rect.bottom <= 0 ||
+                rect.left >= Math.max(window.innerWidth, document.documentElement.clientWidth) ||
+                rect.right <= 0
+            );
+        }
+
+        var videos = document.querySelectorAll("video");
+
+        let playVisibleVideos = function() {
+            for (var i = 0; i < videos.length; i++) {
+                if (isInViewport(videos[i])) {
+                    videos[i].play();
+                } else if (isFullyOutOfViewport(videos[i])) {
+                    videos[i].pause();
+                }
+            }
+        };
+        window.addEventListener("scroll", playVisibleVideos);
+        window.addEventListener("load", playVisibleVideos);
+
+    </script>
+</main>
+
+<footer>
+    <div class="prev-next">
+    <span><a href="/closed-sourcening">← The Great Closed Source-ning</a></span>
+    <span>&nbsp;</span>
+</div>
+
+    <hr/> <br/>
+    <p>Return to <a href="/">home</a> | Subscribe to <a href="/index.xml">RSS</a> | Send me an <a href="mailto:contact@domwillia.ms">email</a> | Follow me on <a href="https://github.com/DomWilliams0">GitHub</a></p>
+</footer>
+</body>
+</html>
+
